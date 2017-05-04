@@ -38,6 +38,10 @@ public class MatcherOfSequence<T> implements IMatcher<T>, IListMatcher<T> {
 	public Optional<MatchResult<T>> match(String str, int start, boolean temporary)
 	{
 		if(matcherList.size() == 0) throw new MatcherEmptyException("Matcher is not set.");
+		else if(start >= str.length() + 1)
+		{
+			return Optional.empty();
+		}
 		else
 		{
 			int current = start;
@@ -71,6 +75,10 @@ public class MatcherOfSequence<T> implements IMatcher<T>, IListMatcher<T> {
 	public Optional<MatchResultList<T>> matchl(String str, int start, boolean temporary)
 	{
 		if(matcherList.size() == 0) throw new MatcherEmptyException("Matcher is not set.");
+		else if(start >= str.length() + 1)
+		{
+			return Optional.empty();
+		}
 		else
 		{
 			int current = start;

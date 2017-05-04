@@ -29,10 +29,11 @@ public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
 	public Optional<MatchResult<T>> match(String str, int start, boolean temporary)
 	{
 		int current = start;
+		int l = str.length();
 
-		for(int i=0; i < times; i++)
+		for(int i=0; i < times && current <= l; i++)
 		{
-			Optional<MatchResult<T>> result = matcher.match(str, current, temporary);
+			Optional<MatchResult<T>> result = matcher.match(str, current, true);
 
 			if(!result.isPresent()) return Optional.empty();
 
@@ -58,9 +59,10 @@ public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
 	public Optional<MatchResultList<T>> matchl(String str, int start, boolean temporary)
 	{
 		int current = start;
+		int l = str.length();
 		ArrayList<MatchResult<T>> resultList = new ArrayList<>();
 
-		for(int i=0; i < times; i++)
+		for(int i=0; i < times && current <= l; i++)
 		{
 			Optional<MatchResult<T>> result = matcher.match(str, current, temporary);
 

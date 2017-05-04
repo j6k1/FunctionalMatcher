@@ -31,6 +31,8 @@ public class MatcerOfCharacterRange<T> implements IMatcerOfCharacterClass<T> {
 	@Override
 	public Optional<MatchResult<T>> match(String str, int start, boolean temporary)
 	{
+		if(start >= str.length()) return Optional.empty();
+
 		char c = str.charAt(start);
 
 		if(c < codeStart || c > codeEnd) return Optional.empty();

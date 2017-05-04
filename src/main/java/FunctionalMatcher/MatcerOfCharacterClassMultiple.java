@@ -38,6 +38,10 @@ public class MatcerOfCharacterClassMultiple<T> implements IMatcher<T> {
 	public Optional<MatchResult<T>> match(String str, int start, boolean temporary)
 	{
 		if(matcherList.size() == 0) throw new MatcherEmptyException("Matcher is not set.");
+		else if(start >= str.length())
+		{
+			return Optional.empty();
+		}
 		else
 		{
 			for(IMatcher<T> matcher: matcherList)

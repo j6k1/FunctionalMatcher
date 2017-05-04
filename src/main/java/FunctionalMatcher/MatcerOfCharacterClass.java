@@ -28,7 +28,7 @@ public class MatcerOfCharacterClass<T> implements IMatcerOfCharacterClass<T> {
 	@Override
 	public Optional<MatchResult<T>> match(String str, int start, boolean temporary)
 	{
-		if(!charactersMap.contains(str.charAt(start))) return Optional.empty();
+		if(start >= str.length() || !charactersMap.contains(str.charAt(start))) return Optional.empty();
 		else if(callback == null || temporary)
 		{
 			return Optional.of(MatchResult.of(new Range(start, start + 1), Optional.empty()));
