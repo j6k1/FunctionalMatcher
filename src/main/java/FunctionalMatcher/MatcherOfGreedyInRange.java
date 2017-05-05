@@ -3,14 +3,13 @@ package FunctionalMatcher;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class MatcherOfLongestInRange<T> implements IMatcher<T>, IListMatcher<T> {
+public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 	protected final int startTimes;
 	protected final int endTimes;
 	protected IOnMatch<T> callback;
 	protected final IMatcher<T> matcher;
-	protected final IMatcher<T> anchor;
 
-	protected MatcherOfLongestInRange(IMatcher<T> matcher, IMatcher<T> anchor,
+	protected MatcherOfGreedyInRange(IMatcher<T> matcher,
 										int startTimes, int endTimes, IOnMatch<T> callback)
 	{
 		if(startTimes > endTimes)
@@ -18,13 +17,12 @@ public class MatcherOfLongestInRange<T> implements IMatcher<T>, IListMatcher<T> 
 			throw new InvalidRangeException("A value greater than end was specified as the value of start.");
 		}
 		this.matcher = matcher;
-		this.anchor = anchor;
 		this.startTimes = startTimes;
 		this.endTimes = endTimes;
 		this.callback = callback;
 	}
 
-	public static <T> MatcherOfLongestInRange<T> of(IMatcher<T> matcher, IMatcher<T> anchor,
+	public static <T> MatcherOfGreedyInRange<T> of(IMatcher<T> matcher, IMatcher<T> anchor,
 												int startTimes, int endTimes, IOnMatch<T> callback)
 	{
 		if(matcher == null)
@@ -40,10 +38,10 @@ public class MatcherOfLongestInRange<T> implements IMatcher<T>, IListMatcher<T> 
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		return new MatcherOfLongestInRange<T>(matcher, anchor, startTimes, endTimes, callback);
+		return new MatcherOfGreedyInRange<T>(matcher, startTimes, endTimes, callback);
 	}
 
-	public static <T> MatcherOfLongestInRange<T> of(IMatcher<T> matcher, IMatcher<T> anchor,
+	public static <T> MatcherOfGreedyInRange<T> of(IMatcher<T> matcher, IMatcher<T> anchor,
 												int startTimes, int endTimes)
 	{
 		if(matcher == null)
@@ -55,7 +53,7 @@ public class MatcherOfLongestInRange<T> implements IMatcher<T>, IListMatcher<T> 
 			throw new NullReferenceNotAllowedException("The reference to the argument anchor is null.");
 		}
 
-		return new MatcherOfLongestInRange<T>(matcher, anchor, startTimes, endTimes, null);
+		return new MatcherOfGreedyInRange<T>(matcher, startTimes, endTimes, null);
 	}
 
 	@Override
@@ -82,11 +80,12 @@ public class MatcherOfLongestInRange<T> implements IMatcher<T>, IListMatcher<T> 
 		{
 			Optional<MatchResult<T>> result = matcher.match(str, current, true);
 
-			MatchResult<T> m = null;
-
-			if(result.isPresent() && anchor.match(str, (m = result.get()).range.end, true).isPresent())
+			if(result.isPresent())
 			{
+				MatchResult<T> m = result.get();
+
 				current = m.range.end;
+				lastEnd = current;
 			}
 			else if(!result.isPresent() && i < startTimes)
 			{
@@ -104,15 +103,15 @@ public class MatcherOfLongestInRange<T> implements IMatcher<T>, IListMatcher<T> 
 		}
 		else if(callback == null || temporary)
 		{
-			return Optional.of(MatchResult.of(new Range(start, lastEnd), Optional.empty()));
+			return Optional.of(MatchResult.of(new Range(start, current), Optional.empty()));
 		}
 		else
 		{
 			return Optional.of(
 					MatchResult.of(
-							new Range(start, lastEnd),
+							new Range(start, current),
 								Optional.of(
-									callback.onmatch(str, new Range(start, lastEnd), Optional.empty()))));
+									callback.onmatch(str, new Range(start, current), Optional.empty()))));
 		}
 	}
 
@@ -126,7 +125,6 @@ public class MatcherOfLongestInRange<T> implements IMatcher<T>, IListMatcher<T> 
 		int current = start;
 		int lastEnd = -1;
 		int l = str.length();
-		ArrayList<MatchResult<T>> tempResultList = new ArrayList<>();
 		ArrayList<MatchResult<T>> resultList = new ArrayList<>();
 
 		if(start < 0)
@@ -147,31 +145,17 @@ public class MatcherOfLongestInRange<T> implements IMatcher<T>, IListMatcher<T> 
 				MatchResult<T> m = result.get();
 
 				current = m.range.end;
+				lastEnd = current;
 
-				tempResultList.add(m);
-
-				if(anchor.match(str, (m = result.get()).range.end, true).isPresent())
+				if(callback != null && !temporary)
 				{
-					lastEnd = current;
-
-					if(callback != null && !temporary)
-					{
-						for(MatchResult<T> t: tempResultList)
-						{
-							resultList.add(MatchResult.of(
-											m.range, Optional.of(
-												callback.onmatch(
-														str, new Range(start, current), Optional.of(t)))));
-						}
-					}
-					else
-					{
-						for(MatchResult<T> t: tempResultList)
-						{
-							resultList.add(t);
-						}
-					}
-					tempResultList = new ArrayList<>();
+					resultList.add(MatchResult.of(m.range,
+									Optional.of(
+										callback.onmatch(str, new Range(start, current), Optional.of(m)))));
+				}
+				else
+				{
+					resultList.add(m);
 				}
 			}
 			else if(!result.isPresent() && i < startTimes)
@@ -190,7 +174,7 @@ public class MatcherOfLongestInRange<T> implements IMatcher<T>, IListMatcher<T> 
 		}
 		else
 		{
-			return Optional.of(MatchResultList.of(new Range(start, lastEnd), resultList));
+			return Optional.of(MatchResultList.of(new Range(start, current), resultList));
 		}
 	}
 }

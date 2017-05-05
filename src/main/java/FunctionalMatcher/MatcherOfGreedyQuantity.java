@@ -3,17 +3,14 @@ package FunctionalMatcher;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListMatcher<T> {
+public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMatcher<T> {
 	protected final int startTimes;
 	protected IOnMatch<T> callback;
 	protected final IMatcher<T> matcher;
-	protected final IMatcher<T> anchor;
 
-	protected MatcherOfLongestQuantity(IMatcher<T> matcher, IMatcher<T> anchor,
-										int startTimes, IOnMatch<T> callback)
+	protected MatcherOfGreedyQuantity(IMatcher<T> matcher, int startTimes, IOnMatch<T> callback)
 	{
 		this.matcher = matcher;
-		this.anchor = anchor;
 		this.startTimes = startTimes;
 		this.callback = callback;
 	}
@@ -26,7 +23,6 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 		}
 
 		int current = start;
-		int lastEnd = -1;
 		int l = str.length();
 
 		if(start < 0)
@@ -42,12 +38,11 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 		{
 			Optional<MatchResult<T>> result = matcher.match(str, current, true);
 
-			MatchResult<T> m = null;
-
-			if(result.isPresent() && anchor.match(str, (m = result.get()).range.end, true).isPresent())
+			if(result.isPresent())
 			{
+				MatchResult<T> m = result.get();
+
 				current = m.range.end;
-				lastEnd = current;
 			}
 			else if(!result.isPresent() && i < startTimes)
 			{
@@ -59,22 +54,17 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 			}
 		}
 
-		if(lastEnd == -1)
+		if(callback == null || temporary)
 		{
-			return Optional.empty();
-		}
-		else if(callback == null || temporary)
-		{
-			return Optional.of(MatchResult.of(new Range(start, lastEnd), Optional.empty()));
+			return Optional.of(MatchResult.of(new Range(start, current), Optional.empty()));
 		}
 		else
 		{
 			return Optional.of(
 					MatchResult.of(
-							new Range(start, lastEnd),
+							new Range(start, current),
 								Optional.of(
-										callback.onmatch(
-												str, new Range(start, lastEnd), Optional.empty()))));
+									callback.onmatch(str, new Range(start, current), Optional.empty()))));
 		}
 	}
 
@@ -86,9 +76,7 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 		}
 
 		int current = start;
-		int lastEnd = -1;
 		int l = str.length();
-		ArrayList<MatchResult<T>> tempResultList = new ArrayList<>();
 		ArrayList<MatchResult<T>> resultList = new ArrayList<>();
 
 		if(start < 0)
@@ -110,30 +98,15 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 
 				current = m.range.end;
 
-				tempResultList.add(m);
-
-				if(anchor.match(str, (m = result.get()).range.end, true).isPresent())
+				if(callback != null && !temporary)
 				{
-					lastEnd = current;
-
-					if(callback != null && !temporary)
-					{
-						for(MatchResult<T> t: tempResultList)
-						{
-							resultList.add(MatchResult.of(
-											m.range, Optional.of(
-												callback.onmatch(
-														str, new Range(start, current), Optional.of(t)))));
-						}
-					}
-					else
-					{
-						for(MatchResult<T> t: tempResultList)
-						{
-							resultList.add(t);
-						}
-					}
-					tempResultList = new ArrayList<>();
+					resultList.add(MatchResult.of(
+									m.range, Optional.of(
+										callback.onmatch(str, new Range(start, current), Optional.of(m)))));
+				}
+				else
+				{
+					resultList.add(m);
 				}
 			}
 			else if(!result.isPresent() && i < startTimes)
@@ -146,13 +119,6 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 			}
 		}
 
-		if(lastEnd == -1)
-		{
-			return Optional.empty();
-		}
-		else
-		{
-			return Optional.of(MatchResultList.of(new Range(start, lastEnd), resultList));
-		}
+		return Optional.of(MatchResultList.of(new Range(start, current), resultList));
 	}
 }

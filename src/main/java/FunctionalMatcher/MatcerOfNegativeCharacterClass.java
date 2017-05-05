@@ -14,17 +14,36 @@ public class MatcerOfNegativeCharacterClass<T> implements IMatcher<T> {
 
 	public static <T> MatcerOfNegativeCharacterClass<T> of(IMatcerOfCharacterClass<T> matcher, IOnMatch<T> callback)
 	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+		else if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
 		return new MatcerOfNegativeCharacterClass<T>(matcher, callback);
 	}
 
 	public static MatcerOfNegativeCharacterClass<Nothing> of(IMatcerOfCharacterClass<Nothing> matcher)
 	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+
 		return new MatcerOfNegativeCharacterClass<Nothing>(matcher, null);
 	}
 
 	@Override
 	public Optional<MatchResult<T>> match(String str, int start, boolean temporary)
 	{
+		if(str == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
+		}
+
 		Optional<MatchResult<T>> result = matcher.match(str, start, true);
 
 		if(result.isPresent()) return Optional.empty();
@@ -37,8 +56,9 @@ public class MatcerOfNegativeCharacterClass<T> implements IMatcher<T> {
 			return Optional.of(
 					MatchResult.of(
 							new Range(start, start + 1),
-								Optional.of(callback.onmatch(str, MatchResult.of(
-									new Range(start, start + 1), Optional.empty())))));
+								Optional.of(
+									callback.onmatch(
+											str, new Range(start, start + 1), Optional.empty()))));
 		}
 	}
 }

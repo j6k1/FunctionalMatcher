@@ -15,20 +15,47 @@ public class MatcerOfCharacterClass<T> implements IMatcerOfCharacterClass<T> {
 		this.callback = callback;
 	}
 
-	public static <T> MatcerOfCharacterClass<T> of(String value, IOnMatch<T> callback)
+	public static <T> MatcerOfCharacterClass<T> of(String characters, IOnMatch<T> callback)
 	{
-		return new MatcerOfCharacterClass<T>(value, callback);
+		if(characters == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument characters is null.");
+		}
+		else if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
+		return new MatcerOfCharacterClass<T>(characters, callback);
 	}
 
-	public static MatcerOfCharacterClass<Nothing> of(String value)
+	public static MatcerOfCharacterClass<Nothing> of(String characters)
 	{
-		return new MatcerOfCharacterClass<Nothing>(value, null);
+		if(characters == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument characters is null.");
+		}
+
+		return new MatcerOfCharacterClass<Nothing>(characters, null);
 	}
 
 	@Override
 	public Optional<MatchResult<T>> match(String str, int start, boolean temporary)
 	{
-		if(start >= str.length() || !charactersMap.contains(str.charAt(start))) return Optional.empty();
+		if(str == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
+		}
+
+		if(start < 0)
+		{
+			throw new InvalidMatchStateException("A negative value was specified for the current position.");
+		}
+		else if(start >= str.length() + 1)
+		{
+			throw new InvalidMatchStateException("The current position is outside the content range.");
+		}
+		else if(start >= str.length() || !charactersMap.contains(str.charAt(start))) return Optional.empty();
 		else if(callback == null || temporary)
 		{
 			return Optional.of(MatchResult.of(new Range(start, start + 1), Optional.empty()));
@@ -38,8 +65,8 @@ public class MatcerOfCharacterClass<T> implements IMatcerOfCharacterClass<T> {
 			return Optional.of(
 					MatchResult.of(
 							new Range(start, start + 1),
-								Optional.of(callback.onmatch(str, MatchResult.of(
-									new Range(start, start + 1), Optional.empty())))));
+								Optional.of(callback.onmatch(str,
+											new Range(start, start + 1), Optional.empty()))));
 		}
 	}
 }
