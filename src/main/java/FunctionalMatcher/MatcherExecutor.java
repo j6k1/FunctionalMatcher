@@ -49,11 +49,14 @@ public class MatcherExecutor {
 
 		ArrayList<MatchResult<T>> results = new ArrayList<>();
 
-		for(int i=0, l=str.length(); i <= l; i++);
+		for(int i=0, l=str.length(); i <= l; i++)
 		{
 			Optional<MatchResult<T>> result = Optional.empty();
 
-			for(int i=0, l=str.length(); i <= l && !(result = matcher.match(str, i, false)).isPresent(); i++);
+			while(i <= l && !(result = matcher.match(str, i, false)).isPresent())
+			{
+				i++;
+			}
 
 			result.ifPresent(r -> results.add(r));
 		}
