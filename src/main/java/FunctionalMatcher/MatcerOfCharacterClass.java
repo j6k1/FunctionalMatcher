@@ -5,13 +5,13 @@ import java.util.Optional;
 
 public class MatcerOfCharacterClass<T> implements IMatcerOfCharacterClass<T> {
 	protected IOnMatch<T> callback;
-	protected final HashSet<Character> charactersMap;
+	protected final HashSet<Character> charactersSet;
 
 	protected MatcerOfCharacterClass(String characters, IOnMatch<T> callback)
 	{
-		charactersMap = new HashSet<>();
+		charactersSet = new HashSet<>();
 		char[] chars = characters.toCharArray();
-		for(char c: chars) charactersMap.add(c);
+		for(char c: chars) charactersSet.add(c);
 		this.callback = callback;
 	}
 
@@ -55,7 +55,7 @@ public class MatcerOfCharacterClass<T> implements IMatcerOfCharacterClass<T> {
 		{
 			throw new InvalidMatchStateException("The current position is outside the content range.");
 		}
-		else if(start >= str.length() || !charactersMap.contains(str.charAt(start))) return Optional.empty();
+		else if(start >= str.length() || !charactersSet.contains(str.charAt(start))) return Optional.empty();
 		else if(callback == null || temporary)
 		{
 			return Optional.of(MatchResult.of(new Range(start, start + 1), Optional.empty()));
