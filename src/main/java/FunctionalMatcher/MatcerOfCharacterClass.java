@@ -3,7 +3,7 @@ package FunctionalMatcher;
 import java.util.HashSet;
 import java.util.Optional;
 
-public class MatcerOfCharacterClass<T> implements IMatcerOfCharacterClass<T> {
+public class MatcerOfCharacterClass<T> implements IMatcherOfCharacterClass<T> {
 	protected IOnMatch<T> callback;
 	protected final HashSet<Character> charactersSet;
 

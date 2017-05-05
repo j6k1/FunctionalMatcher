@@ -4,15 +4,15 @@ import java.util.Optional;
 
 public class MatcerOfNegativeCharacterClass<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
-	protected final IMatcerOfCharacterClass<T> matcher;
+	protected final IMatcherOfCharacterClass<T> matcher;
 
-	protected MatcerOfNegativeCharacterClass(IMatcerOfCharacterClass<T> matcher, IOnMatch<T> callback)
+	protected MatcerOfNegativeCharacterClass(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
 	{
 		this.matcher = matcher;
 		this.callback = callback;
 	}
 
-	public static <T> MatcerOfNegativeCharacterClass<T> of(IMatcerOfCharacterClass<T> matcher, IOnMatch<T> callback)
+	public static <T> MatcerOfNegativeCharacterClass<T> of(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
 	{
 		if(matcher == null)
 		{
@@ -26,7 +26,7 @@ public class MatcerOfNegativeCharacterClass<T> implements IMatcher<T> {
 		return new MatcerOfNegativeCharacterClass<T>(matcher, callback);
 	}
 
-	public static MatcerOfNegativeCharacterClass<Nothing> of(IMatcerOfCharacterClass<Nothing> matcher)
+	public static MatcerOfNegativeCharacterClass<Nothing> of(IMatcherOfCharacterClass<Nothing> matcher)
 	{
 		if(matcher == null)
 		{

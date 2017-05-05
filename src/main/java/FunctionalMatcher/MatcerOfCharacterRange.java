@@ -2,7 +2,7 @@ package FunctionalMatcher;
 
 import java.util.Optional;
 
-public class MatcerOfCharacterRange<T> implements IMatcerOfCharacterClass<T> {
+public class MatcerOfCharacterRange<T> implements IMatcherOfCharacterClass<T> {
 	protected IOnMatch<T> callback;
 	protected final char codeStart;
 	protected final char codeEnd;

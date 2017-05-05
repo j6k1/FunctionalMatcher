@@ -5,15 +5,15 @@ import java.util.Optional;
 
 public class MatcerOfCharacterClassMultiple<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
-	protected final ArrayList<IMatcerOfCharacterClass<T>> matcherList;
+	protected final ArrayList<IMatcherOfCharacterClass<T>> matcherList;
 
-	protected MatcerOfCharacterClassMultiple(ArrayList<IMatcerOfCharacterClass<T>> matcherList, IOnMatch<T> callback)
+	protected MatcerOfCharacterClassMultiple(ArrayList<IMatcherOfCharacterClass<T>> matcherList, IOnMatch<T> callback)
 	{
 		this.matcherList = matcherList;
 		this.callback = callback;
 	}
 
-	public static <T> MatcerOfCharacterClassMultiple<T> of(ArrayList<IMatcerOfCharacterClass<T>> matcherList, IOnMatch<T> callback)
+	public static <T> MatcerOfCharacterClassMultiple<T> of(ArrayList<IMatcherOfCharacterClass<T>> matcherList, IOnMatch<T> callback)
 	{
 		if(matcherList == null)
 		{
@@ -27,7 +27,7 @@ public class MatcerOfCharacterClassMultiple<T> implements IMatcher<T> {
 		return new MatcerOfCharacterClassMultiple<T>(matcherList, callback);
 	}
 
-	public static MatcerOfCharacterClassMultiple<Nothing> of(ArrayList<IMatcerOfCharacterClass<Nothing>> matcherList)
+	public static MatcerOfCharacterClassMultiple<Nothing> of(ArrayList<IMatcherOfCharacterClass<Nothing>> matcherList)
 	{
 		if(matcherList == null)
 		{
@@ -37,7 +37,7 @@ public class MatcerOfCharacterClassMultiple<T> implements IMatcher<T> {
 		return new MatcerOfCharacterClassMultiple<Nothing>(matcherList, null);
 	}
 
-	public static <T> MatcerOfCharacterClassMultiple<T> of(IMatcerOfCharacterClass<T> matcher, IOnMatch<T> callback)
+	public static <T> MatcerOfCharacterClassMultiple<T> of(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
 	{
 		if(matcher == null)
 		{
@@ -48,7 +48,7 @@ public class MatcerOfCharacterClassMultiple<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		ArrayList<IMatcerOfCharacterClass<T>> lst = new ArrayList<IMatcerOfCharacterClass<T>>();
+		ArrayList<IMatcherOfCharacterClass<T>> lst = new ArrayList<IMatcherOfCharacterClass<T>>();
 		lst.add(matcher);
 		return new MatcerOfCharacterClassMultiple<T>(lst, callback);
 	}
@@ -60,23 +60,23 @@ public class MatcerOfCharacterClassMultiple<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		return new MatcerOfCharacterClassMultiple<T>(new ArrayList<IMatcerOfCharacterClass<T>>(), callback);
+		return new MatcerOfCharacterClassMultiple<T>(new ArrayList<IMatcherOfCharacterClass<T>>(), callback);
 	}
 
 
-	public static <T> MatcerOfCharacterClassMultiple<T> of(IMatcerOfCharacterClass<T> matcher)
+	public static <T> MatcerOfCharacterClassMultiple<T> of(IMatcherOfCharacterClass<T> matcher)
 	{
 		if(matcher == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
 		}
 
-		ArrayList<IMatcerOfCharacterClass<T>> lst = new ArrayList<IMatcerOfCharacterClass<T>>();
+		ArrayList<IMatcherOfCharacterClass<T>> lst = new ArrayList<IMatcherOfCharacterClass<T>>();
 		lst.add(matcher);
 		return new MatcerOfCharacterClassMultiple<T>(lst, null);
 	}
 
-	public MatcerOfCharacterClassMultiple<T> add(IMatcerOfCharacterClass<T> matcher)
+	public MatcerOfCharacterClassMultiple<T> add(IMatcherOfCharacterClass<T> matcher)
 	{
 		if(matcher == null)
 		{
