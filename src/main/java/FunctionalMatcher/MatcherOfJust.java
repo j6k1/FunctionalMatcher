@@ -54,7 +54,7 @@ public class MatcherOfJust<T> implements IMatcher<T> {
 		{
 			throw new InvalidMatchStateException("The current position is outside the content range.");
 		}
-		else if(start >= l || !str.startsWith(value, start)) return Optional.empty();
+		else if(start == l || !str.startsWith(value, start)) return Optional.empty();
 		else if(callback == null || temporary)
 		{
 			return Optional.of(MatchResult.of(new Range(start, start + value.length()), Optional.empty()));

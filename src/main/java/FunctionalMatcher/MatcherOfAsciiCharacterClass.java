@@ -58,15 +58,17 @@ public class MatcherOfAsciiCharacterClass<T> implements IMatcherOfCharacterClass
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
 		}
 
+		int l = str.length();
+
 		if(start < 0)
 		{
 			throw new InvalidMatchStateException("A negative value was specified for the current position.");
 		}
-		else if(start >= str.length() + 1)
+		else if(start >= l + 1)
 		{
 			throw new InvalidMatchStateException("The current position is outside the content range.");
 		}
-		else if(start >= str.length() || !characterMap[str.charAt(start)]) return Optional.empty();
+		else if(start == l || !characterMap[str.charAt(start)]) return Optional.empty();
 		else if(callback == null || temporary)
 		{
 			return Optional.of(MatchResult.of(new Range(start, start + 1), Optional.empty()));

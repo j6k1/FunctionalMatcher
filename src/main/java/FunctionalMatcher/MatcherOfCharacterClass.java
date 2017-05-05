@@ -3,11 +3,11 @@ package FunctionalMatcher;
 import java.util.HashSet;
 import java.util.Optional;
 
-public class MatcerOfCharacterClass<T> implements IMatcherOfCharacterClass<T> {
+public class MatcherOfCharacterClass<T> implements IMatcherOfCharacterClass<T> {
 	protected IOnMatch<T> callback;
 	protected final HashSet<Character> charactersSet;
 
-	protected MatcerOfCharacterClass(String characters, IOnMatch<T> callback)
+	protected MatcherOfCharacterClass(String characters, IOnMatch<T> callback)
 	{
 		charactersSet = new HashSet<>();
 		char[] chars = characters.toCharArray();
@@ -15,7 +15,7 @@ public class MatcerOfCharacterClass<T> implements IMatcherOfCharacterClass<T> {
 		this.callback = callback;
 	}
 
-	public static <T> MatcerOfCharacterClass<T> of(String characters, IOnMatch<T> callback)
+	public static <T> MatcherOfCharacterClass<T> of(String characters, IOnMatch<T> callback)
 	{
 		if(characters == null)
 		{
@@ -26,17 +26,17 @@ public class MatcerOfCharacterClass<T> implements IMatcherOfCharacterClass<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		return new MatcerOfCharacterClass<T>(characters, callback);
+		return new MatcherOfCharacterClass<T>(characters, callback);
 	}
 
-	public static MatcerOfCharacterClass<Nothing> of(String characters)
+	public static MatcherOfCharacterClass<Nothing> of(String characters)
 	{
 		if(characters == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument characters is null.");
 		}
 
-		return new MatcerOfCharacterClass<Nothing>(characters, null);
+		return new MatcherOfCharacterClass<Nothing>(characters, null);
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class MatcerOfCharacterClass<T> implements IMatcherOfCharacterClass<T> {
 		{
 			throw new InvalidMatchStateException("The current position is outside the content range.");
 		}
-		else if(start >= str.length() || !charactersSet.contains(str.charAt(start))) return Optional.empty();
+		else if(start == str.length() || !charactersSet.contains(str.charAt(start))) return Optional.empty();
 		else if(callback == null || temporary)
 		{
 			return Optional.of(MatchResult.of(new Range(start, start + 1), Optional.empty()));

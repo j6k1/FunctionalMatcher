@@ -2,12 +2,12 @@ package FunctionalMatcher;
 
 import java.util.Optional;
 
-public class MatcerOfCharacterRange<T> implements IMatcherOfCharacterClass<T> {
+public class MatcherOfCharacterRange<T> implements IMatcherOfCharacterClass<T> {
 	protected IOnMatch<T> callback;
 	protected final char codeStart;
 	protected final char codeEnd;
 
-	protected MatcerOfCharacterRange(char codeStart, char codeEnd, IOnMatch<T> callback)
+	protected MatcherOfCharacterRange(char codeStart, char codeEnd, IOnMatch<T> callback)
 	{
 		if(codeStart > codeEnd)
 		{
@@ -18,19 +18,19 @@ public class MatcerOfCharacterRange<T> implements IMatcherOfCharacterClass<T> {
 		this.callback = callback;
 	}
 
-	public static <T> MatcerOfCharacterRange<T> of(char codeStart, char codeEnd, IOnMatch<T> callback)
+	public static <T> MatcherOfCharacterRange<T> of(char codeStart, char codeEnd, IOnMatch<T> callback)
 	{
 		if(callback == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		return new MatcerOfCharacterRange<T>(codeStart, codeEnd, callback);
+		return new MatcherOfCharacterRange<T>(codeStart, codeEnd, callback);
 	}
 
-	public static MatcerOfCharacterRange<Nothing> of(char codeStart, char codeEnd)
+	public static MatcherOfCharacterRange<Nothing> of(char codeStart, char codeEnd)
 	{
-		return new MatcerOfCharacterRange<Nothing>(codeStart, codeEnd, null);
+		return new MatcherOfCharacterRange<Nothing>(codeStart, codeEnd, null);
 	}
 
 	@Override
@@ -43,17 +43,18 @@ public class MatcerOfCharacterRange<T> implements IMatcherOfCharacterClass<T> {
 
 		if(start >= str.length()) return Optional.empty();
 
-		char c = str.charAt(start);
+		char c;
+		int l = str.length();
 
 		if(start < 0)
 		{
 			throw new InvalidMatchStateException("A negative value was specified for the current position.");
 		}
-		else if(start >= str.length() + 1)
+		else if(start >= l + 1)
 		{
 			throw new InvalidMatchStateException("The current position is outside the content range.");
 		}
-		else if(c < codeStart || c > codeEnd) return Optional.empty();
+		else if(start == l || (c = str.charAt(start)) < codeStart || c > codeEnd) return Optional.empty();
 		else if(callback == null || temporary)
 		{
 			return Optional.of(MatchResult.of(new Range(start, start + 1), Optional.empty()));

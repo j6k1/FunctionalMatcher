@@ -2,17 +2,17 @@ package FunctionalMatcher;
 
 import java.util.Optional;
 
-public class MatcerOfNegativeCharacterClass<T> implements IMatcher<T> {
+public class MatcherOfNegativeCharacterClass<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
 	protected final IMatcherOfCharacterClass<T> matcher;
 
-	protected MatcerOfNegativeCharacterClass(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
+	protected MatcherOfNegativeCharacterClass(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
 	{
 		this.matcher = matcher;
 		this.callback = callback;
 	}
 
-	public static <T> MatcerOfNegativeCharacterClass<T> of(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
+	public static <T> MatcherOfNegativeCharacterClass<T> of(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
 	{
 		if(matcher == null)
 		{
@@ -23,17 +23,17 @@ public class MatcerOfNegativeCharacterClass<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		return new MatcerOfNegativeCharacterClass<T>(matcher, callback);
+		return new MatcherOfNegativeCharacterClass<T>(matcher, callback);
 	}
 
-	public static MatcerOfNegativeCharacterClass<Nothing> of(IMatcherOfCharacterClass<Nothing> matcher)
+	public static MatcherOfNegativeCharacterClass<Nothing> of(IMatcherOfCharacterClass<Nothing> matcher)
 	{
 		if(matcher == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
 		}
 
-		return new MatcerOfNegativeCharacterClass<Nothing>(matcher, null);
+		return new MatcherOfNegativeCharacterClass<Nothing>(matcher, null);
 	}
 
 	@Override

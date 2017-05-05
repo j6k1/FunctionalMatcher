@@ -106,10 +106,6 @@ public class MatcherOfSequence<T> implements IMatcher<T>, IListMatcher<T> {
 		{
 			throw new InvalidMatchStateException("The current position is outside the content range.");
 		}
-		else if(start == l)
-		{
-			return Optional.empty();
-		}
 		else
 		{
 			int current = start;
@@ -159,10 +155,6 @@ public class MatcherOfSequence<T> implements IMatcher<T>, IListMatcher<T> {
 		else if(start >= l + 1)
 		{
 			throw new InvalidMatchStateException("The current position is outside the content range.");
-		}
-		else if(start == l)
-		{
-			return Optional.empty();
 		}
 		else
 		{
