@@ -59,6 +59,7 @@ public class MatcherOfAsciiCharacterClass<T> implements IMatcherOfCharacterClass
 		}
 
 		int l = str.length();
+		char c;
 
 		if(start < 0)
 		{
@@ -68,7 +69,7 @@ public class MatcherOfAsciiCharacterClass<T> implements IMatcherOfCharacterClass
 		{
 			throw new InvalidMatchStateException("The current position is outside the content range.");
 		}
-		else if(start == l || !characterMap[str.charAt(start)]) return Optional.empty();
+		else if(start == l || (c = str.charAt(start)) >= 0x80 || !characterMap[c]) return Optional.empty();
 		else if(callback == null || temporary)
 		{
 			return Optional.of(MatchResult.of(new Range(start, start + 1), Optional.empty()));
