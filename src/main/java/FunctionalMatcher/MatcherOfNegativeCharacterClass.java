@@ -4,9 +4,33 @@ import java.util.Optional;
 
 public class MatcherOfNegativeCharacterClass<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
-	protected final IMatcherOfCharacterClass<T> matcher;
+	protected IMatcherOfCharacterClass<T> matcher;
 
-	protected MatcherOfNegativeCharacterClass(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
+	public MatcherOfNegativeCharacterClass(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
+	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+		else if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
+		init(matcher, callback);
+	}
+
+	public MatcherOfNegativeCharacterClass(IMatcherOfCharacterClass<T> matcher)
+	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+
+		init(matcher, null);
+	}
+
+	protected void init(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
 	{
 		this.matcher = matcher;
 		this.callback = callback;
@@ -26,14 +50,14 @@ public class MatcherOfNegativeCharacterClass<T> implements IMatcher<T> {
 		return new MatcherOfNegativeCharacterClass<T>(matcher, callback);
 	}
 
-	public static MatcherOfNegativeCharacterClass<Nothing> of(IMatcherOfCharacterClass<Nothing> matcher)
+	public static <T> MatcherOfNegativeCharacterClass<T> of(IMatcherOfCharacterClass<T> matcher)
 	{
 		if(matcher == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
 		}
 
-		return new MatcherOfNegativeCharacterClass<Nothing>(matcher, null);
+		return new MatcherOfNegativeCharacterClass<T>(matcher);
 	}
 
 	@Override

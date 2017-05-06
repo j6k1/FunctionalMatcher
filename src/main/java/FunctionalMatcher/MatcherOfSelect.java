@@ -5,9 +5,71 @@ import java.util.Optional;
 
 public class MatcherOfSelect<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
-	protected final ArrayList<IMatcher<T>> matcherList;
+	protected ArrayList<IMatcher<T>> matcherList;
 
-	protected MatcherOfSelect(ArrayList<IMatcher<T>> matcherList, IOnMatch<T> callback)
+	public MatcherOfSelect(ArrayList<IMatcher<T>> matcherList, IOnMatch<T> callback)
+	{
+		if(matcherList == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcherList is null.");
+		}
+		else if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
+		init(matcherList, callback);
+	}
+
+	public MatcherOfSelect(ArrayList<IMatcher<T>> matcherList)
+	{
+		if(matcherList == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcherList is null.");
+		}
+
+		init(matcherList, null);
+	}
+
+	public MatcherOfSelect(IMatcher<T> matcher, IOnMatch<T> callback)
+	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+		else if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
+		ArrayList<IMatcher<T>> lst = new ArrayList<IMatcher<T>>();
+		lst.add(matcher);
+		init(lst, callback);
+	}
+
+	public MatcherOfSelect(IOnMatch<T> callback)
+	{
+		if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
+		init(new ArrayList<IMatcher<T>>(), callback);
+	}
+
+	public MatcherOfSelect(IMatcher<T> matcher)
+	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+
+		ArrayList<IMatcher<T>> lst = new ArrayList<IMatcher<T>>();
+		lst.add(matcher);
+		init(lst, null);
+	}
+
+	protected void init(ArrayList<IMatcher<T>> matcherList, IOnMatch<T> callback)
 	{
 		this.matcherList = matcherList;
 		this.callback = callback;
@@ -15,64 +77,27 @@ public class MatcherOfSelect<T> implements IMatcher<T> {
 
 	public static <T> MatcherOfSelect<T> of(ArrayList<IMatcher<T>> matcherList, IOnMatch<T> callback)
 	{
-		if(matcherList == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcherList is null.");
-		}
-		else if(callback == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
-		}
-
 		return new MatcherOfSelect<T>(matcherList, callback);
 	}
 
-	public static MatcherOfSelect<Nothing> of(ArrayList<IMatcher<Nothing>> matcherList)
+	public static <T> MatcherOfSelect<T> of(ArrayList<IMatcher<T>> matcherList)
 	{
-		if(matcherList == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcherList is null.");
-		}
-
-		return new MatcherOfSelect<Nothing>(matcherList, null);
+		return new MatcherOfSelect<T>(matcherList);
 	}
 
 	public static <T> MatcherOfSelect<T> of(IMatcher<T> matcher, IOnMatch<T> callback)
 	{
-		if(matcher == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
-		}
-		else if(callback == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
-		}
-
-		ArrayList<IMatcher<T>> lst = new ArrayList<IMatcher<T>>();
-		lst.add(matcher);
-		return new MatcherOfSelect<T>(lst, callback);
+		return new MatcherOfSelect<T>(matcher, callback);
 	}
 
 	public static <T> MatcherOfSelect<T> of(IOnMatch<T> callback)
 	{
-		if(callback == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
-		}
-
-		return new MatcherOfSelect<T>(new ArrayList<IMatcher<T>>(), callback);
+		return new MatcherOfSelect<T>(callback);
 	}
 
 	public static <T> MatcherOfSelect<T> of(IMatcher<T> matcher)
 	{
-		if(matcher == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
-		}
-
-		ArrayList<IMatcher<T>> lst = new ArrayList<IMatcher<T>>();
-		lst.add(matcher);
-		return new MatcherOfSelect<T>(lst, null);
+		return new MatcherOfSelect<T>(matcher);
 	}
 
 	public MatcherOfSelect<T> add(IMatcher<T> matcher)

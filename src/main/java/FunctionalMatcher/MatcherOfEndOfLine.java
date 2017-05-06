@@ -5,24 +5,34 @@ import java.util.Optional;
 public class MatcherOfEndOfLine<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
 
-	protected MatcherOfEndOfLine(IOnMatch<T> callback)
-	{
-		this.callback = callback;
-	}
-
-	public static <T> MatcherOfEndOfLine<T> of(IOnMatch<T> callback)
+	public MatcherOfEndOfLine(IOnMatch<T> callback)
 	{
 		if(callback == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
+		init(callback);
+	}
+
+	public MatcherOfEndOfLine()
+	{
+		init(null);
+	}
+
+	protected void init(IOnMatch<T> callback)
+	{
+		this.callback = callback;
+	}
+
+	public static <T> MatcherOfEndOfLine<T> of(IOnMatch<T> callback)
+	{
 		return new MatcherOfEndOfLine<T>(callback);
 	}
 
 	public static MatcherOfEndOfLine<Nothing> of()
 	{
-		return new MatcherOfEndOfLine<Nothing>(null);
+		return new MatcherOfEndOfLine<Nothing>();
 	}
 
 	@Override

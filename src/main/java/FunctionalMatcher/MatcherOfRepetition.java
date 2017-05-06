@@ -5,17 +5,10 @@ import java.util.Optional;
 
 public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
 	protected IOnMatch<T> callback;
-	protected final IMatcher<T> matcher;
-	protected final int times;
+	protected IMatcher<T> matcher;
+	protected int times;
 
-	protected MatcherOfRepetition(IMatcher<T> matcher, int times, IOnMatch<T> callback)
-	{
-		this.matcher = matcher;
-		this.times = times;
-		this.callback = callback;
-	}
-
-	public static <T> MatcherOfRepetition<T> of(IMatcher<T> matcher, int times, IOnMatch<T> callback)
+	public MatcherOfRepetition(IMatcher<T> matcher, int times, IOnMatch<T> callback)
 	{
 		if(matcher == null)
 		{
@@ -26,6 +19,28 @@ public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
+		init(matcher, times, callback);
+	}
+
+	public MatcherOfRepetition(IMatcher<T> matcher, int times)
+	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+
+		init(matcher, times, null);
+	}
+
+	protected void init(IMatcher<T> matcher, int times, IOnMatch<T> callback)
+	{
+		this.matcher = matcher;
+		this.times = times;
+		this.callback = callback;
+	}
+
+	public static <T> MatcherOfRepetition<T> of(IMatcher<T> matcher, int times, IOnMatch<T> callback)
+	{
 		return new MatcherOfRepetition<T>(matcher, times, callback);
 	}
 
@@ -36,7 +51,7 @@ public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
 		}
 
-		return new MatcherOfRepetition<T>(matcher, times, null);
+		return new MatcherOfRepetition<T>(matcher, times);
 	}
 
 	@Override

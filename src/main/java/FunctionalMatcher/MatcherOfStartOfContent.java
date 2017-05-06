@@ -5,24 +5,33 @@ import java.util.Optional;
 public class MatcherOfStartOfContent<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
 
-	protected MatcherOfStartOfContent(IOnMatch<T> callback)
+	public MatcherOfStartOfContent(IOnMatch<T> callback)
+	{
+		if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+		init(callback);
+	}
+
+	public MatcherOfStartOfContent()
+	{
+		init(null);
+	}
+
+	protected void init(IOnMatch<T> callback)
 	{
 		this.callback = callback;
 	}
 
 	public static <T> MatcherOfStartOfContent<T> of(IOnMatch<T> callback)
 	{
-		if(callback == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
-		}
-
 		return new MatcherOfStartOfContent<T>(callback);
 	}
 
 	public static MatcherOfStartOfContent<Nothing> of()
 	{
-		return new MatcherOfStartOfContent<Nothing>(null);
+		return new MatcherOfStartOfContent<Nothing>();
 	}
 
 	@Override

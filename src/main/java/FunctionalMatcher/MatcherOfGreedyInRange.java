@@ -4,13 +4,37 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
-	protected final int startTimes;
-	protected final int endTimes;
+	protected int startTimes;
+	protected int endTimes;
 	protected IOnMatch<T> callback;
-	protected final IMatcher<T> matcher;
+	protected IMatcher<T> matcher;
 
-	protected MatcherOfGreedyInRange(IMatcher<T> matcher,
+	public MatcherOfGreedyInRange(IMatcher<T> matcher,
 										int startTimes, int endTimes, IOnMatch<T> callback)
+	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+		else if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
+		init(matcher, startTimes, endTimes, callback);
+	}
+
+	public MatcherOfGreedyInRange(IMatcher<T> matcher, int startTimes, int endTimes)
+	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+
+		init(matcher, startTimes, endTimes, null);
+	}
+
+	protected void init(IMatcher<T> matcher, int startTimes, int endTimes, IOnMatch<T> callback)
 	{
 		if(startTimes > endTimes)
 		{
@@ -22,38 +46,16 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 		this.callback = callback;
 	}
 
-	public static <T> MatcherOfGreedyInRange<T> of(IMatcher<T> matcher, IMatcher<T> anchor,
-												int startTimes, int endTimes, IOnMatch<T> callback)
+	public static <T> MatcherOfGreedyInRange<T> of(IMatcher<T> matcher,
+													int startTimes, int endTimes, IOnMatch<T> callback)
 	{
-		if(matcher == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
-		}
-		else if(anchor == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument anchor is null.");
-		}
-		else if(callback == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
-		}
-
 		return new MatcherOfGreedyInRange<T>(matcher, startTimes, endTimes, callback);
 	}
 
-	public static <T> MatcherOfGreedyInRange<T> of(IMatcher<T> matcher, IMatcher<T> anchor,
-												int startTimes, int endTimes)
+	public static <T> MatcherOfGreedyInRange<T> of(IMatcher<T> matcher,
+													int startTimes, int endTimes)
 	{
-		if(matcher == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
-		}
-		else if(anchor == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument anchor is null.");
-		}
-
-		return new MatcherOfGreedyInRange<T>(matcher, startTimes, endTimes, null);
+		return new MatcherOfGreedyInRange<T>(matcher, startTimes, endTimes);
 	}
 
 	@Override

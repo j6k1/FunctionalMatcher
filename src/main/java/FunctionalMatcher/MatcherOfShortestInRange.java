@@ -4,13 +4,47 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T> {
-	protected final int startTimes;
-	protected final int endTimes;
+	protected int startTimes;
+	protected int endTimes;
 	protected IOnMatch<T> callback;
-	protected final IMatcher<T> matcher;
-	protected final IMatcher<T> anchor;
+	protected IMatcher<T> matcher;
+	protected IMatcher<T> anchor;
 
-	protected MatcherOfShortestInRange(IMatcher<T> matcher, IMatcher<T> anchor,
+	public MatcherOfShortestInRange(IMatcher<T> matcher, IMatcher<T> anchor,
+										int startTimes, int endTimes, IOnMatch<T> callback)
+	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+		else if(anchor == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument anchor is null.");
+		}
+		else if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
+		init(matcher, anchor, startTimes, endTimes, callback);
+	}
+
+	public MatcherOfShortestInRange(IMatcher<T> matcher, IMatcher<T> anchor,
+										int startTimes, int endTimes)
+	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+		else if(anchor == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument anchor is null.");
+		}
+
+		init(matcher, anchor, startTimes, endTimes, null);
+	}
+
+	protected void init(IMatcher<T> matcher, IMatcher<T> anchor,
 										int startTimes, int endTimes, IOnMatch<T> callback)
 	{
 		if(startTimes > endTimes)
@@ -27,35 +61,13 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 	public static <T> MatcherOfShortestInRange<T> of(IMatcher<T> matcher, IMatcher<T> anchor,
 												int startTimes, int endTimes, IOnMatch<T> callback)
 	{
-		if(matcher == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
-		}
-		else if(anchor == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument anchor is null.");
-		}
-		else if(callback == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
-		}
-
 		return new MatcherOfShortestInRange<T>(matcher, anchor, startTimes, endTimes, callback);
 	}
 
 	public static <T> MatcherOfShortestInRange<T> of(IMatcher<T> matcher, IMatcher<T> anchor,
 												int startTimes, int endTimes)
 	{
-		if(matcher == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
-		}
-		else if(anchor == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument anchor is null.");
-		}
-
-		return new MatcherOfShortestInRange<T>(matcher, anchor, startTimes, endTimes, null);
+		return new MatcherOfShortestInRange<T>(matcher, anchor, startTimes, endTimes);
 	}
 
 	@Override

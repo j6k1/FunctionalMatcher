@@ -5,9 +5,71 @@ import java.util.Optional;
 
 public class MatcherOfSequence<T> implements IMatcher<T>, IListMatcher<T> {
 	protected IOnMatch<T> callback;
-	protected final ArrayList<IMatcher<T>> matcherList;
+	protected ArrayList<IMatcher<T>> matcherList;
 
-	protected MatcherOfSequence(ArrayList<IMatcher<T>> matcherList, IOnMatch<T> callback)
+	public MatcherOfSequence(ArrayList<IMatcher<T>> matcherList, IOnMatch<T> callback)
+	{
+		if(matcherList == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcherList is null.");
+		}
+		else if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
+		init(matcherList, callback);
+	}
+
+	public MatcherOfSequence(ArrayList<IMatcher<T>> matcherList)
+	{
+		if(matcherList == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcherList is null.");
+		}
+
+		init(matcherList, null);
+	}
+
+	public MatcherOfSequence(IMatcher<T> matcher, IOnMatch<T> callback)
+	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+		else if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
+		ArrayList<IMatcher<T>> lst = new ArrayList<IMatcher<T>>();
+		lst.add(matcher);
+		init(lst, callback);
+	}
+
+	public MatcherOfSequence(IOnMatch<T> callback)
+	{
+		if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
+		init(new ArrayList<IMatcher<T>>(), callback);
+	}
+
+	public MatcherOfSequence(IMatcher<T> matcher)
+	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+
+		ArrayList<IMatcher<T>> lst = new ArrayList<IMatcher<T>>();
+		lst.add(matcher);
+		init(lst, null);
+	}
+
+	protected void init(ArrayList<IMatcher<T>> matcherList, IOnMatch<T> callback)
 	{
 		this.matcherList = matcherList;
 		this.callback = callback;
@@ -15,65 +77,28 @@ public class MatcherOfSequence<T> implements IMatcher<T>, IListMatcher<T> {
 
 	public static <T> MatcherOfSequence<T> of(ArrayList<IMatcher<T>> matcherList, IOnMatch<T> callback)
 	{
-		if(matcherList == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcherList is null.");
-		}
-		else if(callback == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
-		}
-
 		return new MatcherOfSequence<T>(matcherList, callback);
 	}
 
-	public static MatcherOfSequence<Nothing> of(ArrayList<IMatcher<Nothing>> matcherList)
+	public static <T> MatcherOfSequence<T> of(ArrayList<IMatcher<T>> matcherList)
 	{
-		if(matcherList == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcherList is null.");
-		}
-
-		return new MatcherOfSequence<Nothing>(matcherList, null);
+		return new MatcherOfSequence<T>(matcherList);
 	}
 
 
 	public static <T> MatcherOfSequence<T> of(IMatcher<T> matcher, IOnMatch<T> callback)
 	{
-		if(matcher == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
-		}
-		else if(callback == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
-		}
-
-		ArrayList<IMatcher<T>> lst = new ArrayList<IMatcher<T>>();
-		lst.add(matcher);
-		return new MatcherOfSequence<T>(lst, callback);
+		return new MatcherOfSequence<T>(matcher, callback);
 	}
 
 	public static <T> MatcherOfSequence<T> of(IOnMatch<T> callback)
 	{
-		if(callback == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
-		}
-
-		return new MatcherOfSequence<T>(new ArrayList<IMatcher<T>>(), callback);
+		return new MatcherOfSequence<T>(callback);
 	}
 
 	public static <T> MatcherOfSequence<T> of(IMatcher<T> matcher)
 	{
-		if(matcher == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
-		}
-
-		ArrayList<IMatcher<T>> lst = new ArrayList<IMatcher<T>>();
-		lst.add(matcher);
-		return new MatcherOfSequence<T>(lst, null);
+		return new MatcherOfSequence<T>(matcher);
 	}
 
 	public MatcherOfSequence<T> add(IMatcher<T> matcher)

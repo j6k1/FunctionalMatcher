@@ -4,9 +4,24 @@ import java.util.Optional;
 
 public class MatcherOfAnyChar<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
-	protected final boolean multiline;
+	protected boolean multiline;
 
-	protected MatcherOfAnyChar(boolean multiline, IOnMatch<T> callback)
+	public MatcherOfAnyChar(boolean multiline, IOnMatch<T> callback)
+	{
+		if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
+		init(multiline, callback);
+	}
+
+	public MatcherOfAnyChar(boolean multiline)
+	{
+		init(multiline, null);
+	}
+
+	protected void init(boolean multiline, IOnMatch<T> callback)
 	{
 		this.multiline = multiline;
 		this.callback = callback;
@@ -24,7 +39,7 @@ public class MatcherOfAnyChar<T> implements IMatcher<T> {
 
 	public static MatcherOfAnyChar<Nothing> of(boolean multiline)
 	{
-		return new MatcherOfAnyChar<Nothing>(multiline, null);
+		return new MatcherOfAnyChar<Nothing>(multiline);
 	}
 
 	@Override

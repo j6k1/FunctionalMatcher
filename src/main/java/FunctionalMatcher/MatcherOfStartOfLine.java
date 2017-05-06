@@ -5,24 +5,34 @@ import java.util.Optional;
 public class MatcherOfStartOfLine<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
 
-	protected MatcherOfStartOfLine(IOnMatch<T> callback)
-	{
-		this.callback = callback;
-	}
-
-	public static <T> MatcherOfStartOfLine<T> of(IOnMatch<T> callback)
+	public MatcherOfStartOfLine(IOnMatch<T> callback)
 	{
 		if(callback == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
+		init(callback);
+	}
+
+	public MatcherOfStartOfLine()
+	{
+		init(null);
+	}
+
+	protected void init(IOnMatch<T> callback)
+	{
+		this.callback = callback;
+	}
+
+	public static <T> MatcherOfStartOfLine<T> of(IOnMatch<T> callback)
+	{
 		return new MatcherOfStartOfLine<T>(callback);
 	}
 
 	public static MatcherOfStartOfLine<Nothing> of()
 	{
-		return new MatcherOfStartOfLine<Nothing>(null);
+		return new MatcherOfStartOfLine<Nothing>();
 	}
 
 	@Override

@@ -4,12 +4,45 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public abstract class MatcherOfShortestQuantity<T> implements IMatcher<T>, IListMatcher<T> {
-	protected final int startTimes;
+	protected int startTimes;
 	protected IOnMatch<T> callback;
-	protected final IMatcher<T> matcher;
-	protected final IMatcher<T> anchor;
+	protected IMatcher<T> matcher;
+	protected IMatcher<T> anchor;
 
-	protected MatcherOfShortestQuantity(IMatcher<T> matcher, IMatcher<T> anchor,
+	public MatcherOfShortestQuantity(IMatcher<T> matcher, IMatcher<T> anchor,
+										int startTimes, IOnMatch<T> callback)
+	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+		else if(anchor == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument anchor is null.");
+		}
+		else if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
+		init(matcher, anchor, startTimes, callback);
+	}
+
+	public MatcherOfShortestQuantity(IMatcher<T> matcher, IMatcher<T> anchor, int startTimes)
+	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+		else if(anchor == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument anchor is null.");
+		}
+
+		init(matcher, anchor, startTimes, null);
+	}
+
+	protected void init(IMatcher<T> matcher, IMatcher<T> anchor,
 										int startTimes, IOnMatch<T> callback)
 	{
 		this.matcher = matcher;

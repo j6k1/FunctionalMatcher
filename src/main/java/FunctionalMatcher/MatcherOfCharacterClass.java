@@ -5,17 +5,9 @@ import java.util.Optional;
 
 public class MatcherOfCharacterClass<T> implements IMatcherOfCharacterClass<T> {
 	protected IOnMatch<T> callback;
-	protected final HashSet<Character> charactersSet;
+	protected final HashSet<Character> charactersSet = new HashSet<>();
 
-	protected MatcherOfCharacterClass(String characters, IOnMatch<T> callback)
-	{
-		charactersSet = new HashSet<>();
-		char[] chars = characters.toCharArray();
-		for(char c: chars) charactersSet.add(c);
-		this.callback = callback;
-	}
-
-	public static <T> MatcherOfCharacterClass<T> of(String characters, IOnMatch<T> callback)
+	public MatcherOfCharacterClass(String characters, IOnMatch<T> callback)
 	{
 		if(characters == null)
 		{
@@ -26,17 +18,34 @@ public class MatcherOfCharacterClass<T> implements IMatcherOfCharacterClass<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		return new MatcherOfCharacterClass<T>(characters, callback);
+		init(characters, callback);
 	}
 
-	public static MatcherOfCharacterClass<Nothing> of(String characters)
+	public MatcherOfCharacterClass(String characters)
 	{
 		if(characters == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument characters is null.");
 		}
 
-		return new MatcherOfCharacterClass<Nothing>(characters, null);
+		init(characters, null);
+	}
+
+	protected void init(String characters, IOnMatch<T> callback)
+	{
+		char[] chars = characters.toCharArray();
+		for(char c: chars) charactersSet.add(c);
+		this.callback = callback;
+	}
+
+	public static <T> MatcherOfCharacterClass<T> of(String characters, IOnMatch<T> callback)
+	{
+		return new MatcherOfCharacterClass<T>(characters, callback);
+	}
+
+	public static <T> MatcherOfCharacterClass<T> of(String characters)
+	{
+		return new MatcherOfCharacterClass<T>(characters);
 	}
 
 	@Override

@@ -4,15 +4,9 @@ import java.util.Optional;
 
 public class MatcherOfOneOrZero<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
-	protected final IMatcher<T> matcher;
+	protected IMatcher<T> matcher;
 
-	protected MatcherOfOneOrZero(IMatcher<T> matcher, IOnMatch<T> callback)
-	{
-		this.matcher = matcher;
-		this.callback = callback;
-	}
-
-	public static <T> MatcherOfOneOrZero<T> of(IMatcher<T> matcher, IOnMatch<T> callback)
+	public MatcherOfOneOrZero(IMatcher<T> matcher, IOnMatch<T> callback)
 	{
 		if(matcher == null)
 		{
@@ -23,6 +17,27 @@ public class MatcherOfOneOrZero<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
+		init(matcher, callback);
+	}
+
+	public MatcherOfOneOrZero(IMatcher<T> matcher)
+	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+
+		init(matcher, null);
+	}
+
+	protected void init(IMatcher<T> matcher, IOnMatch<T> callback)
+	{
+		this.matcher = matcher;
+		this.callback = callback;
+	}
+
+	public static <T> MatcherOfOneOrZero<T> of(IMatcher<T> matcher, IOnMatch<T> callback)
+	{
 		return new MatcherOfOneOrZero<T>(matcher, callback);
 	}
 
@@ -33,7 +48,7 @@ public class MatcherOfOneOrZero<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
 		}
 
-		return new MatcherOfOneOrZero<T>(matcher, null);
+		return new MatcherOfOneOrZero<T>(matcher);
 	}
 
 	@Override

@@ -4,11 +4,35 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMatcher<T> {
-	protected final int startTimes;
+	protected int startTimes;
 	protected IOnMatch<T> callback;
-	protected final IMatcher<T> matcher;
+	protected IMatcher<T> matcher;
 
-	protected MatcherOfGreedyQuantity(IMatcher<T> matcher, int startTimes, IOnMatch<T> callback)
+	public MatcherOfGreedyQuantity(IMatcher<T> matcher, int startTimes, IOnMatch<T> callback)
+	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+		else if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
+		init(matcher, startTimes, callback);
+	}
+
+	public MatcherOfGreedyQuantity(IMatcher<T> matcher, int startTimes)
+	{
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+
+		init(matcher, startTimes, null);
+	}
+
+	protected void init(IMatcher<T> matcher, int startTimes, IOnMatch<T> callback)
 	{
 		this.matcher = matcher;
 		this.startTimes = startTimes;

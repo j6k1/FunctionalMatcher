@@ -5,15 +5,9 @@ import java.util.Optional;
 
 public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
-	protected final ArrayList<IMatcherOfCharacterClass<T>> matcherList;
+	protected final ArrayList<IMatcherOfCharacterClass<T>> matcherList = new ArrayList<>();
 
-	protected MatcherOfCharacterClassMultiple(ArrayList<IMatcherOfCharacterClass<T>> matcherList, IOnMatch<T> callback)
-	{
-		this.matcherList = matcherList;
-		this.callback = callback;
-	}
-
-	public static <T> MatcherOfCharacterClassMultiple<T> of(ArrayList<IMatcherOfCharacterClass<T>> matcherList, IOnMatch<T> callback)
+	public MatcherOfCharacterClassMultiple(ArrayList<IMatcherOfCharacterClass<T>> matcherList, IOnMatch<T> callback)
 	{
 		if(matcherList == null)
 		{
@@ -24,20 +18,20 @@ public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		return new MatcherOfCharacterClassMultiple<T>(matcherList, callback);
+		init(matcherList, callback);
 	}
 
-	public static MatcherOfCharacterClassMultiple<Nothing> of(ArrayList<IMatcherOfCharacterClass<Nothing>> matcherList)
+	public MatcherOfCharacterClassMultiple(ArrayList<IMatcherOfCharacterClass<T>> matcherList)
 	{
 		if(matcherList == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument matcherList is null.");
 		}
 
-		return new MatcherOfCharacterClassMultiple<Nothing>(matcherList, null);
+		init(matcherList, null);
 	}
 
-	public static <T> MatcherOfCharacterClassMultiple<T> of(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
+	public MatcherOfCharacterClassMultiple(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
 	{
 		if(matcher == null)
 		{
@@ -50,21 +44,21 @@ public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 
 		ArrayList<IMatcherOfCharacterClass<T>> lst = new ArrayList<IMatcherOfCharacterClass<T>>();
 		lst.add(matcher);
-		return new MatcherOfCharacterClassMultiple<T>(lst, callback);
+
+		init(lst, callback);
 	}
 
-	public static <T> MatcherOfCharacterClassMultiple<T> of(IOnMatch<T> callback)
+	public MatcherOfCharacterClassMultiple(IOnMatch<T> callback)
 	{
 		if(callback == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		return new MatcherOfCharacterClassMultiple<T>(new ArrayList<IMatcherOfCharacterClass<T>>(), callback);
+		init(new ArrayList<IMatcherOfCharacterClass<T>>(), callback);
 	}
 
-
-	public static <T> MatcherOfCharacterClassMultiple<T> of(IMatcherOfCharacterClass<T> matcher)
+	public MatcherOfCharacterClassMultiple(IMatcherOfCharacterClass<T> matcher)
 	{
 		if(matcher == null)
 		{
@@ -73,7 +67,38 @@ public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 
 		ArrayList<IMatcherOfCharacterClass<T>> lst = new ArrayList<IMatcherOfCharacterClass<T>>();
 		lst.add(matcher);
-		return new MatcherOfCharacterClassMultiple<T>(lst, null);
+		init(lst, null);
+	}
+
+	protected void init(ArrayList<IMatcherOfCharacterClass<T>> matcherList, IOnMatch<T> callback)
+	{
+		this.matcherList.addAll(matcherList);
+		this.callback = callback;
+	}
+
+	public static <T> MatcherOfCharacterClassMultiple<T> of(ArrayList<IMatcherOfCharacterClass<T>> matcherList, IOnMatch<T> callback)
+	{
+		return new MatcherOfCharacterClassMultiple<T>(matcherList, callback);
+	}
+
+	public static <T> MatcherOfCharacterClassMultiple<T> of(ArrayList<IMatcherOfCharacterClass<T>> matcherList)
+	{
+		return new MatcherOfCharacterClassMultiple<T>(matcherList);
+	}
+
+	public static <T> MatcherOfCharacterClassMultiple<T> of(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
+	{
+		return new MatcherOfCharacterClassMultiple<T>(matcher, callback);
+	}
+
+	public static <T> MatcherOfCharacterClassMultiple<T> of(IOnMatch<T> callback)
+	{
+		return new MatcherOfCharacterClassMultiple<T>(callback);
+	}
+
+	public static <T> MatcherOfCharacterClassMultiple<T> of(IMatcherOfCharacterClass<T> matcher)
+	{
+		return new MatcherOfCharacterClassMultiple<T>(matcher);
 	}
 
 	public MatcherOfCharacterClassMultiple<T> add(IMatcherOfCharacterClass<T> matcher)

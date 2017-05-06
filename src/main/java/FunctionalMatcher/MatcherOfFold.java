@@ -4,15 +4,9 @@ import java.util.Optional;
 
 public class MatcherOfFold<T> implements IMatcher<T> {
 	protected IOnListMatch<T> callback;
-	protected final IListMatcher<T> matcher;
+	protected IListMatcher<T> matcher;
 
-	protected MatcherOfFold(IListMatcher<T> matcher, IOnListMatch<T> callback)
-	{
-		this.matcher = matcher;
-		this.callback = callback;
-	}
-
-	public static <T> MatcherOfFold<T> of(IListMatcher<T> matcher, IOnListMatch<T> callback)
+	public MatcherOfFold(IListMatcher<T> matcher, IOnListMatch<T> callback)
 	{
 		if(matcher == null)
 		{
@@ -23,6 +17,17 @@ public class MatcherOfFold<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
+		init(matcher, callback);
+	}
+
+	protected void init(IListMatcher<T> matcher, IOnListMatch<T> callback)
+	{
+		this.matcher = matcher;
+		this.callback = callback;
+	}
+
+	public static <T> MatcherOfFold<T> of(IListMatcher<T> matcher, IOnListMatch<T> callback)
+	{
 		return new MatcherOfFold<T>(matcher, callback);
 	}
 

@@ -5,24 +5,34 @@ import java.util.Optional;
 public class MatcherOfTerminateWithNewLine<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
 
-	protected MatcherOfTerminateWithNewLine(IOnMatch<T> callback)
-	{
-		this.callback = callback;
-	}
-
-	public static <T> MatcherOfTerminateWithNewLine<T> of(IOnMatch<T> callback)
+	public MatcherOfTerminateWithNewLine(IOnMatch<T> callback)
 	{
 		if(callback == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
+		init(callback);
+	}
+
+	public MatcherOfTerminateWithNewLine()
+	{
+		init(null);
+	}
+
+	protected void init(IOnMatch<T> callback)
+	{
+		this.callback = callback;
+	}
+
+	public static <T> MatcherOfTerminateWithNewLine<T> of(IOnMatch<T> callback)
+	{
 		return new MatcherOfTerminateWithNewLine<T>(callback);
 	}
 
 	public static MatcherOfTerminateWithNewLine<Nothing> of()
 	{
-		return new MatcherOfTerminateWithNewLine<Nothing>(null);
+		return new MatcherOfTerminateWithNewLine<Nothing>();
 	}
 
 	@Override

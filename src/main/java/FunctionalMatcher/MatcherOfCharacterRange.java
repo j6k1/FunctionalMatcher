@@ -4,10 +4,25 @@ import java.util.Optional;
 
 public class MatcherOfCharacterRange<T> implements IMatcherOfCharacterClass<T> {
 	protected IOnMatch<T> callback;
-	protected final char codeStart;
-	protected final char codeEnd;
+	protected char codeStart;
+	protected char codeEnd;
 
-	protected MatcherOfCharacterRange(char codeStart, char codeEnd, IOnMatch<T> callback)
+	public MatcherOfCharacterRange(char codeStart, char codeEnd, IOnMatch<T> callback)
+	{
+		if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
+		init(codeStart, codeEnd, callback);
+	}
+
+	public MatcherOfCharacterRange(char codeStart, char codeEnd)
+	{
+		init(codeStart, codeEnd, null);
+	}
+
+	protected void init(char codeStart, char codeEnd, IOnMatch<T> callback)
 	{
 		if(codeStart > codeEnd)
 		{
@@ -20,17 +35,12 @@ public class MatcherOfCharacterRange<T> implements IMatcherOfCharacterClass<T> {
 
 	public static <T> MatcherOfCharacterRange<T> of(char codeStart, char codeEnd, IOnMatch<T> callback)
 	{
-		if(callback == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
-		}
-
 		return new MatcherOfCharacterRange<T>(codeStart, codeEnd, callback);
 	}
 
 	public static MatcherOfCharacterRange<Nothing> of(char codeStart, char codeEnd)
 	{
-		return new MatcherOfCharacterRange<Nothing>(codeStart, codeEnd, null);
+		return new MatcherOfCharacterRange<Nothing>(codeStart, codeEnd);
 	}
 
 	@Override
