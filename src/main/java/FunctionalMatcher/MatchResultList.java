@@ -32,4 +32,20 @@ public class MatchResultList<T> implements Iterable<MatchResult<T>> {
 	{
 		return results.size();
 	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if(o instanceof MatchResultList)
+		{
+			@SuppressWarnings("rawtypes")
+			MatchResultList r = (MatchResultList)o;
+
+			return (this.range.equals(r.range) && this.results.equals(r.results));
+		}
+		else
+		{
+			return false;
+		}
+	}
 }

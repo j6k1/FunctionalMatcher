@@ -16,4 +16,20 @@ public class MatchResult<T> {
 	{
 		return new MatchResult<T>(range, value);
 	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if(o instanceof MatchResult)
+		{
+			@SuppressWarnings("rawtypes")
+			MatchResult r = (MatchResult)o;
+
+			return (this.range.equals(r.range) && this.value.equals(r.value));
+		}
+		else
+		{
+			return false;
+		}
+	}
 }

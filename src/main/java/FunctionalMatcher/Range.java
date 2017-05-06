@@ -9,4 +9,11 @@ public class Range {
 		this.start = start;
 		this.end = end;
 	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if(!(o instanceof Range)) return false;
+		else return this.start == ((Range)o).start && this.end == ((Range)o).end;
+	}
 }
