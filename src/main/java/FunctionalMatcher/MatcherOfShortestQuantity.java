@@ -170,7 +170,8 @@ public abstract class MatcherOfShortestQuantity<T> implements IMatcher<T>, IList
 			}
 			else if(!result.isPresent())
 			{
-				if(i == 0) current++;
+				if(i == 0 && start == l) return Optional.empty();
+				else if(i == 0) current++;
 				break;
 			}
 		}

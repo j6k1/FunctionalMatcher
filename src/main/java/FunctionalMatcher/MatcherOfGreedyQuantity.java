@@ -78,7 +78,8 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 			}
 			else if(!result.isPresent())
 			{
-				if(i == 0) current++;
+				if(i == 0 && start == l) return Optional.empty();
+				else if(i == 0) current++;
 				break;
 			}
 		}
@@ -144,7 +145,8 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 			}
 			else if(!result.isPresent())
 			{
-				if(i == 0) current++;
+				if(i == 0 && start == l) return Optional.empty();
+				else if(i == 0) current++;
 				break;
 			}
 		}

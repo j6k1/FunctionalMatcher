@@ -126,7 +126,8 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 			}
 			else if(!result.isPresent())
 			{
-				if(i == 0) current++;
+				if(i == 0 && start == l) return Optional.empty();
+				else if(i == 0) current++;
 				break;
 			}
 		}
@@ -188,7 +189,8 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 			}
 			else if(!result.isPresent())
 			{
-				if(i == 0) current++;
+				if(i == 0 && start == l) return Optional.empty();
+				else if(i == 0) current++;
 				break;
 			}
 		}
