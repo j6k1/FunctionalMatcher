@@ -36,7 +36,11 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 
 	protected void init(IMatcher<T> matcher, int startTimes, int endTimes, IOnMatch<T> callback)
 	{
-		if(startTimes > endTimes)
+		if(startTimes < 0)
+		{
+			throw new InvalidMatchConditionException("A negative value was specified for the number of matches.");
+		}
+		else if(startTimes > endTimes)
 		{
 			throw new InvalidRangeException("A value greater than end was specified as the value of start.");
 		}
@@ -95,6 +99,7 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 			}
 			else if(!result.isPresent())
 			{
+				if(i == 0) current++;
 				break;
 			}
 		}
@@ -166,6 +171,7 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 			}
 			else if(!result.isPresent())
 			{
+				if(i == 0) current++;
 				break;
 			}
 		}

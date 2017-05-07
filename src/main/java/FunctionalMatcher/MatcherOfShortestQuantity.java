@@ -45,6 +45,10 @@ public abstract class MatcherOfShortestQuantity<T> implements IMatcher<T>, IList
 	protected void init(IMatcher<T> matcher, IMatcher<T> anchor,
 										int startTimes, IOnMatch<T> callback)
 	{
+		if(startTimes < 0)
+		{
+			throw new InvalidMatchConditionException("A negative value was specified for the number of matches.");
+		}
 		this.matcher = matcher;
 		this.anchor = anchor;
 		this.startTimes = startTimes;
@@ -103,6 +107,7 @@ public abstract class MatcherOfShortestQuantity<T> implements IMatcher<T>, IList
 			}
 			else if(!result.isPresent())
 			{
+				if(i == 0) current++;
 				break;
 			}
 		}
@@ -165,6 +170,7 @@ public abstract class MatcherOfShortestQuantity<T> implements IMatcher<T>, IList
 			}
 			else if(!result.isPresent())
 			{
+				if(i == 0) current++;
 				break;
 			}
 		}

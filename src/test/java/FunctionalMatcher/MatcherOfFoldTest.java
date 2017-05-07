@@ -119,15 +119,6 @@ public class MatcherOfFoldTest {
 						MatcherOfGreedyZeroOrMore.of(
 							MatcherOfSequence.of(
 								MatcherOfSelect.of(
-									MatcherOfGreedyZeroOrMore.of(
-										MatcherOfNegativeCharacterClass.of(
-											new MatcherOfAsciiCharacterClass<ICsv>(",\r\n")
-										),
-										(str, r, m) -> {
-											return (ICsv)new CsvField(str.substring(r.start, r.end));
-										}
-									)
-								).add(
 									MatcherOfSequence.of(
 										new MatcherOfJust<ICsv>("\"")
 									).add(
@@ -145,6 +136,15 @@ public class MatcherOfFoldTest {
 											}
 										)
 									).add(new MatcherOfJust<ICsv>("\""))
+								).add(
+									MatcherOfGreedyZeroOrMore.of(
+										MatcherOfNegativeCharacterClass.of(
+											new MatcherOfAsciiCharacterClass<ICsv>(",\r\n")
+										),
+										(str, r, m) -> {
+											return (ICsv)new CsvField(str.substring(r.start, r.end));
+										}
+									)
 								)
 							)
 							.add(MatcherOfSelect.of(new MatcherOfJust<ICsv>(","))

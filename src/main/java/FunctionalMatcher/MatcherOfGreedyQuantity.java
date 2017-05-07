@@ -34,6 +34,10 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 
 	protected void init(IMatcher<T> matcher, int startTimes, IOnMatch<T> callback)
 	{
+		if(startTimes < 0)
+		{
+			throw new InvalidMatchConditionException("A negative value was specified for the number of matches.");
+		}
 		this.matcher = matcher;
 		this.startTimes = startTimes;
 		this.callback = callback;
@@ -74,6 +78,7 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 			}
 			else if(!result.isPresent())
 			{
+				if(i == 0) current++;
 				break;
 			}
 		}
@@ -139,6 +144,7 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 			}
 			else if(!result.isPresent())
 			{
+				if(i == 0) current++;
 				break;
 			}
 		}

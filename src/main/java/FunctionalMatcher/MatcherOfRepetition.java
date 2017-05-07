@@ -18,6 +18,10 @@ public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
+		else if(times < 1)
+		{
+			throw new InvalidMatchConditionException("A value less than 1 was specified for the number of matches.");
+		}
 
 		init(matcher, times, callback);
 	}

@@ -70,7 +70,7 @@ public class MatcherOfNegativeCharacterClass<T> implements IMatcher<T> {
 
 		Optional<MatchResult<T>> result = matcher.match(str, start, true);
 
-		if(result.isPresent()) return Optional.empty();
+		if(start == str.length() || result.isPresent()) return Optional.empty();
 		else if(callback == null || temporary)
 		{
 			return Optional.of(MatchResult.of(new Range(start, start + 1), Optional.empty()));
