@@ -96,12 +96,13 @@ public class MatcherOfLongestInRange<T> implements IMatcher<T>, IListMatcher<T> 
 
 		for(int i=0; i < endTimes && current <= l; i++)
 		{
-			Optional<MatchResult<T>> result = matcher.match(str, current, true);
+			Optional<MatchResult<T>> result = matcher.match(str, current, temporary);
 
 			MatchResult<T> m = null;
 
 			if(result.isPresent() && anchor.match(str, (m = result.get()).range.end, true).isPresent())
 			{
+				if(current == m.range.end) break;
 				current = m.range.end;
 			}
 			else if(!result.isPresent() && i < startTimes)
@@ -110,8 +111,6 @@ public class MatcherOfLongestInRange<T> implements IMatcher<T>, IListMatcher<T> 
 			}
 			else if(!result.isPresent())
 			{
-				if(i == 0 && start == l) return Optional.empty();
-				else if(i == 0) current++;
 				break;
 			}
 		}
@@ -164,13 +163,11 @@ public class MatcherOfLongestInRange<T> implements IMatcher<T>, IListMatcher<T> 
 			{
 				MatchResult<T> m = result.get();
 
-				current = m.range.end;
-
 				tempResultList.add(m);
 
 				if(anchor.match(str, (m = result.get()).range.end, true).isPresent())
 				{
-					lastEnd = current;
+					lastEnd = m.range.end;
 
 					if(callback != null && !temporary)
 					{
@@ -179,7 +176,7 @@ public class MatcherOfLongestInRange<T> implements IMatcher<T>, IListMatcher<T> 
 							resultList.add(MatchResult.of(
 											m.range, Optional.of(
 												callback.onmatch(
-														str, new Range(start, current), Optional.of(t)))));
+														str, new Range(start, m.range.end), Optional.of(t)))));
 						}
 					}
 					else
@@ -191,6 +188,9 @@ public class MatcherOfLongestInRange<T> implements IMatcher<T>, IListMatcher<T> 
 					}
 					tempResultList = new ArrayList<>();
 				}
+
+				if(current == m.range.end) break;
+				current = m.range.end;
 			}
 			else if(!result.isPresent() && i < startTimes)
 			{
@@ -198,8 +198,6 @@ public class MatcherOfLongestInRange<T> implements IMatcher<T>, IListMatcher<T> 
 			}
 			else if(!result.isPresent())
 			{
-				if(i == 0 && start == l) return Optional.empty();
-				else if(i == 0) current++;
 				break;
 			}
 		}

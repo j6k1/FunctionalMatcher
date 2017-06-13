@@ -7,9 +7,9 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 	protected int startTimes;
 	protected int endTimes;
 	protected IOnMatch<T> callback;
-	protected IMatcher<T> matcher;
+	protected IContinuationMatcher<T> matcher;
 
-	public MatcherOfGreedyInRange(IMatcher<T> matcher,
+	public MatcherOfGreedyInRange(IContinuationMatcher<T> matcher,
 										int startTimes, int endTimes, IOnMatch<T> callback)
 	{
 		if(matcher == null)
@@ -24,7 +24,7 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 		init(matcher, startTimes, endTimes, callback);
 	}
 
-	public MatcherOfGreedyInRange(IMatcher<T> matcher, int startTimes, int endTimes)
+	public MatcherOfGreedyInRange(IContinuationMatcher<T> matcher, int startTimes, int endTimes)
 	{
 		if(matcher == null)
 		{
@@ -34,7 +34,7 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 		init(matcher, startTimes, endTimes, null);
 	}
 
-	protected void init(IMatcher<T> matcher, int startTimes, int endTimes, IOnMatch<T> callback)
+	protected void init(IContinuationMatcher<T> matcher, int startTimes, int endTimes, IOnMatch<T> callback)
 	{
 		if(startTimes < 0)
 		{
@@ -50,13 +50,13 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 		this.callback = callback;
 	}
 
-	public static <T> MatcherOfGreedyInRange<T> of(IMatcher<T> matcher,
+	public static <T> MatcherOfGreedyInRange<T> of(IContinuationMatcher<T> matcher,
 													int startTimes, int endTimes, IOnMatch<T> callback)
 	{
 		return new MatcherOfGreedyInRange<T>(matcher, startTimes, endTimes, callback);
 	}
 
-	public static <T> MatcherOfGreedyInRange<T> of(IMatcher<T> matcher,
+	public static <T> MatcherOfGreedyInRange<T> of(IContinuationMatcher<T> matcher,
 													int startTimes, int endTimes)
 	{
 		return new MatcherOfGreedyInRange<T>(matcher, startTimes, endTimes);
@@ -84,14 +84,28 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 
 		for(int i=0; i < endTimes && current <= l; i++)
 		{
-			Optional<MatchResult<T>> result = matcher.match(str, current, true);
+			Optional<IContinuation<T>> result = matcher.matchc(str, current, temporary);
 
 			if(result.isPresent())
 			{
-				MatchResult<T> m = result.get();
+				IContinuation<T> r = result.get();
+				MatchResult<T> m = r.result();
 
-				current = m.range.end;
-				lastEnd = current;
+				if(!r.isContinuation())
+				{
+					lastEnd = (i < startTimes) ? -1 : m.range.end;
+					break;
+				}
+				else if(current == m.range.end)
+				{
+					lastEnd = (i < startTimes) ? -1 : current;
+					break;
+				}
+				else
+				{
+					current = m.range.end;
+					lastEnd = current;
+				}
 			}
 			else if(!result.isPresent() && i < startTimes)
 			{
@@ -99,8 +113,6 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 			}
 			else if(!result.isPresent())
 			{
-				if(i == 0 && start == l) return Optional.empty();
-				else if(i == 0) current++;
 				break;
 			}
 		}
@@ -146,24 +158,38 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 
 		for(int i=0; i < endTimes && current <= l; i++)
 		{
-			Optional<MatchResult<T>> result = matcher.match(str, current, temporary);
+			Optional<IContinuation<T>> result = matcher.matchc(str, current, temporary);
 
 			if(result.isPresent())
 			{
-				MatchResult<T> m = result.get();
-
-				current = m.range.end;
-				lastEnd = current;
+				IContinuation<T> r = result.get();
+				MatchResult<T> m = r.result();
 
 				if(callback != null && !temporary)
 				{
 					resultList.add(MatchResult.of(m.range,
 									Optional.of(
-										callback.onmatch(str, new Range(start, current), Optional.of(m)))));
+										callback.onmatch(str, new Range(start, m.range.end), Optional.of(m)))));
 				}
 				else
 				{
 					resultList.add(m);
+				}
+
+				if(!r.isContinuation())
+				{
+					lastEnd = (i < startTimes) ? -1 : m.range.end;
+					break;
+				}
+				else if(current == m.range.end)
+				{
+					lastEnd = (i < startTimes) ? -1 : current;
+					break;
+				}
+				else
+				{
+					current = m.range.end;
+					lastEnd = current;
 				}
 			}
 			else if(!result.isPresent() && i < startTimes)
@@ -172,8 +198,6 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 			}
 			else if(!result.isPresent())
 			{
-				if(i == 0 && start == l) return Optional.empty();
-				else if(i == 0) current++;
 				break;
 			}
 		}

@@ -77,14 +77,22 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 
 		for(int i=0; current <= l; i++)
 		{
-			Optional<MatchResult<T>> result = matcher.match(str, current, true);
+			Optional<MatchResult<T>> result = matcher.match(str, current, temporary);
 
 			MatchResult<T> m = null;
 
 			if(result.isPresent() && anchor.match(str, (m = result.get()).range.end, true).isPresent())
 			{
-				current = m.range.end;
-				lastEnd = current;
+				if(current == m.range.end)
+				{
+					lastEnd = current;
+					break;
+				}
+				else
+				{
+					current = m.range.end;
+					lastEnd = current;
+				}
 			}
 			else if(!result.isPresent() && i < startTimes)
 			{
@@ -92,8 +100,6 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 			}
 			else if(!result.isPresent())
 			{
-				if(i == 0 && start == l) return Optional.empty();
-				else if(i == 0) current++;
 				break;
 			}
 		}
@@ -147,13 +153,11 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 			{
 				MatchResult<T> m = result.get();
 
-				current = m.range.end;
-
 				tempResultList.add(m);
 
 				if(anchor.match(str, (m = result.get()).range.end, true).isPresent())
 				{
-					lastEnd = current;
+					lastEnd = m.range.end;
 
 					if(callback != null && !temporary)
 					{
@@ -162,7 +166,7 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 							resultList.add(MatchResult.of(
 											m.range, Optional.of(
 												callback.onmatch(
-														str, new Range(start, current), Optional.of(t)))));
+														str, new Range(start, m.range.end), Optional.of(t)))));
 						}
 					}
 					else
@@ -174,6 +178,9 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 					}
 					tempResultList = new ArrayList<>();
 				}
+
+				if(current == m.range.end) break;
+				current = m.range.end;
 			}
 			else if(!result.isPresent() && i < startTimes)
 			{
@@ -181,8 +188,6 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 			}
 			else if(!result.isPresent())
 			{
-				if(i == 0 && start == l) return Optional.empty();
-				else if(i == 0) current++;
 				break;
 			}
 		}

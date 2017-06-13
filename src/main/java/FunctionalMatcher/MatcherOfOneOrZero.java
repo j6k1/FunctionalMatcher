@@ -72,18 +72,9 @@ public class MatcherOfOneOrZero<T> implements IMatcher<T> {
 
 		if(!result.isPresent())
 		{
-			MatchResult<T> m = result.get();
-
 			if(callback == null || temporary)
 			{
-				if(m.value.isPresent())
-				{
-					return Optional.of(MatchResult.of(new Range(start, start), m.value));
-				}
-				else
-				{
-					return Optional.of(MatchResult.of(new Range(start, start), Optional.empty()));
-				}
+				return Optional.of(MatchResult.of(new Range(start, start), Optional.empty()));
 			}
 			else
 			{
@@ -91,19 +82,19 @@ public class MatcherOfOneOrZero<T> implements IMatcher<T> {
 						MatchResult.of(
 								new Range(start, start),
 									Optional.of(
-										callback.onmatch(str, new Range(start, start), Optional.of(m)))));
+										callback.onmatch(str, new Range(start, start), Optional.empty()))));
 			}
 		}
 		else if(callback == null || temporary)
 		{
 			return Optional.of(
-					MatchResult.of(new Range(start, start + result.get().range.end), Optional.empty()));
+					MatchResult.of(new Range(start, result.get().range.end), Optional.empty()));
 		}
 		else
 		{
 			return Optional.of(
 					MatchResult.of(
-						new Range(start, start + result.get().range.end),
+						new Range(start, result.get().range.end),
 							Optional.of(
 								callback.onmatch(
 									str,

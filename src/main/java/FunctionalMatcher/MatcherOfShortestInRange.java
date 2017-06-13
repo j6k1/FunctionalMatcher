@@ -95,19 +95,17 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 
 		for(int i=0; i < endTimes && current <= l; i++)
 		{
-			Optional<MatchResult<T>> result = matcher.match(str, current, true);
+			Optional<MatchResult<T>> result = matcher.match(str, current, temporary);
 
 			MatchResult<T> m = null;
 
 			if(result.isPresent() && anchor.match(str, (m = result.get()).range.end, true).isPresent())
 			{
-				current = m.range.end;
-
 				if(i + 1 >= startTimes)
 				{
 					if(callback == null || temporary)
 					{
-						return Optional.of(MatchResult.of(new Range(start, current), Optional.empty()));
+						return Optional.of(MatchResult.of(new Range(start, m.range.end), Optional.empty()));
 					}
 					else
 					{
@@ -116,9 +114,11 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 										new Range(start, current),
 											Optional.of(
 												callback.onmatch(
-													str, new Range(start, current), Optional.empty()))));
+													str, new Range(start, m.range.end), Optional.empty()))));
 					}
 				}
+				if(current == m.range.end) break;
+				current = m.range.end;
 			}
 			else if(!result.isPresent() && i < startTimes)
 			{
@@ -126,9 +126,15 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 			}
 			else if(!result.isPresent())
 			{
-				if(i == 0 && start == l) return Optional.empty();
-				else if(i == 0) current++;
 				break;
+			}
+			else if(current == m.range.end)
+			{
+				break;
+			}
+			else
+			{
+				current = m.range.end;
 			}
 		}
 
@@ -164,13 +170,11 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 			{
 				MatchResult<T> m = result.get();
 
-				current = m.range.end;
-
 				if(callback != null && !temporary)
 				{
 					resultList.add(MatchResult.of(
 									m.range, Optional.of(
-										callback.onmatch(str, new Range(start, current), Optional.of(m)))));
+										callback.onmatch(str, new Range(start, m.range.end), Optional.of(m)))));
 				}
 				else
 				{
@@ -179,9 +183,16 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 
 				if(anchor.match(str, (m = result.get()).range.end, true).isPresent())
 				{
+					current = m.range.end;
 					lastEnd = current;
 					break;
 				}
+				else if(current == m.range.end)
+				{
+					lastEnd = m.range.end;
+					break;
+				}
+				current = m.range.end;
 			}
 			else if(!result.isPresent() && i < startTimes)
 			{
@@ -189,8 +200,6 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 			}
 			else if(!result.isPresent())
 			{
-				if(i == 0 && start == l) return Optional.empty();
-				else if(i == 0) current++;
 				break;
 			}
 		}

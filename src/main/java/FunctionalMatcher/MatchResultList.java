@@ -2,8 +2,12 @@ package FunctionalMatcher;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class MatchResultList<T> implements Iterable<MatchResult<T>> {
+public class MatchResultList<T> implements Iterable<MatchResult<T>>  {
 	public final Range range;
 	public final ArrayList<MatchResult<T>> results;
 
@@ -33,6 +37,46 @@ public class MatchResultList<T> implements Iterable<MatchResult<T>> {
 		return results.size();
 	}
 
+	public Stream<MatchResult<T>> stream()
+	{
+		return results.stream();
+	}
+
+	public <R> Optional<MatchResult<R>> next(String str, IMatcher<R> matcher)
+	{
+		return matcher.match(str, range.end, false);
+	}
+
+	public <R> Optional<MatchResultList<R>> nextl(String str, IListMatcher<R> matcher)
+	{
+		return matcher.matchl(str, range.end, false);
+	}
+
+	public MatchResultList<T> compositeOf(int end)
+	{
+		return MatchResultList.of(new Range(range.start, end), results);
+	}
+
+	public MatchResultList<T> compositeOf(int start, int end)
+	{
+		return MatchResultList.of(new Range(start, end), results);
+	}
+
+	public MatchResultList<T> compositeOf(Range range)
+	{
+		return MatchResultList.of(range, results);
+	}
+
+	public <I> MatchResultList<T> compositeOf(MatchResult<I> m)
+	{
+		return MatchResultList.of(m.range, results);
+	}
+
+	public MatchResultList<T> compositeOfStart(int start)
+	{
+		return MatchResultList.of(new Range(start, range.end), results);
+	}
+
 	@Override
 	public boolean equals(Object o)
 	{
@@ -47,5 +91,12 @@ public class MatchResultList<T> implements Iterable<MatchResult<T>> {
 		{
 			return false;
 		}
+	}
+
+	@Override
+	public String toString()
+	{
+		List<String> lst = results.stream().map(r -> r.toString()).collect(Collectors.toList());
+		return String.join(", ", lst);
 	}
 }

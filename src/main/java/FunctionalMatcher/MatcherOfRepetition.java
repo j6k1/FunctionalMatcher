@@ -80,7 +80,7 @@ public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
 
 		for(int i=0; i < times && current <= l; i++)
 		{
-			Optional<MatchResult<T>> result = matcher.match(str, current, true);
+			Optional<MatchResult<T>> result = matcher.match(str, current, temporary);
 
 			if(!result.isPresent()) return Optional.empty();
 

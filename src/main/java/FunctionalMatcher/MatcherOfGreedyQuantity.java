@@ -6,9 +6,9 @@ import java.util.Optional;
 public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMatcher<T> {
 	protected int startTimes;
 	protected IOnMatch<T> callback;
-	protected IMatcher<T> matcher;
+	protected IContinuationMatcher<T> matcher;
 
-	public MatcherOfGreedyQuantity(IMatcher<T> matcher, int startTimes, IOnMatch<T> callback)
+	public MatcherOfGreedyQuantity(IContinuationMatcher<T> matcher, int startTimes, IOnMatch<T> callback)
 	{
 		if(matcher == null)
 		{
@@ -22,7 +22,7 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 		init(matcher, startTimes, callback);
 	}
 
-	public MatcherOfGreedyQuantity(IMatcher<T> matcher, int startTimes)
+	public MatcherOfGreedyQuantity(IContinuationMatcher<T> matcher, int startTimes)
 	{
 		if(matcher == null)
 		{
@@ -32,7 +32,7 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 		init(matcher, startTimes, null);
 	}
 
-	protected void init(IMatcher<T> matcher, int startTimes, IOnMatch<T> callback)
+	protected void init(IContinuationMatcher<T> matcher, int startTimes, IOnMatch<T> callback)
 	{
 		if(startTimes < 0)
 		{
@@ -49,7 +49,6 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
 		}
-
 		int current = start;
 		int l = str.length();
 
@@ -64,13 +63,25 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 
 		for(int i=0; current <= l; i++)
 		{
-			Optional<MatchResult<T>> result = matcher.match(str, current, true);
+			Optional<IContinuation<T>> result = matcher.matchc(str, current, temporary);
 
 			if(result.isPresent())
 			{
-				MatchResult<T> m = result.get();
+				IContinuation<T> r = result.get();
+				MatchResult<T> m = r.result();
+
+				if(current == m.range.end)
+				{
+					break;
+				}
 
 				current = m.range.end;
+
+				if(!r.isContinuation())
+				{
+					if(i < startTimes) return Optional.empty();
+					else break;
+				}
 			}
 			else if(!result.isPresent() && i < startTimes)
 			{
@@ -78,8 +89,6 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 			}
 			else if(!result.isPresent())
 			{
-				if(i == 0 && start == l) return Optional.empty();
-				else if(i == 0) current++;
 				break;
 			}
 		}
@@ -120,23 +129,35 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 
 		for(int i=0; current <= l; i++)
 		{
-			Optional<MatchResult<T>> result = matcher.match(str, current, temporary);
+			Optional<IContinuation<T>> result = matcher.matchc(str, current, temporary);
 
 			if(result.isPresent())
 			{
-				MatchResult<T> m = result.get();
-
-				current = m.range.end;
+				IContinuation<T> r = result.get();
+				MatchResult<T> m = r.result();
 
 				if(callback != null && !temporary)
 				{
 					resultList.add(MatchResult.of(
 									m.range, Optional.of(
-										callback.onmatch(str, new Range(start, current), Optional.of(m)))));
+										callback.onmatch(str, new Range(start, m.range.end), Optional.of(m)))));
 				}
 				else
 				{
 					resultList.add(m);
+				}
+
+				if(current == m.range.end)
+				{
+					break;
+				}
+
+				current = m.range.end;
+
+				if(!r.isContinuation())
+				{
+					if(i < startTimes) return Optional.empty();
+					else break;
 				}
 			}
 			else if(!result.isPresent() && i < startTimes)
@@ -145,8 +166,6 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 			}
 			else if(!result.isPresent())
 			{
-				if(i == 0 && start == l) return Optional.empty();
-				else if(i == 0) current++;
 				break;
 			}
 		}
