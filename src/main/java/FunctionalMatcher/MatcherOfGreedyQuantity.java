@@ -8,7 +8,7 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 	protected IOnMatch<T> callback;
 	protected IContinuationMatcher<T> matcher;
 
-	public MatcherOfGreedyQuantity(IContinuationMatcher<T> matcher, int startTimes, IOnMatch<T> callback)
+	public MatcherOfGreedyQuantity(IOnMatch<T> callback, IContinuationMatcher<T> matcher, int startTimes)
 	{
 		if(matcher == null)
 		{
@@ -19,7 +19,7 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(matcher, startTimes, callback);
+		init(callback, matcher, startTimes);
 	}
 
 	public MatcherOfGreedyQuantity(IContinuationMatcher<T> matcher, int startTimes)
@@ -29,10 +29,10 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
 		}
 
-		init(matcher, startTimes, null);
+		init(null, matcher, startTimes);
 	}
 
-	protected void init(IContinuationMatcher<T> matcher, int startTimes, IOnMatch<T> callback)
+	protected void init(IOnMatch<T> callback, IContinuationMatcher<T> matcher, int startTimes)
 	{
 		if(startTimes < 0)
 		{
@@ -103,7 +103,7 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 					MatchResult.of(
 							new Range(start, current),
 								Optional.of(
-									callback.onmatch(str, new Range(start, current), Optional.empty()))));
+									callback.onmatch(str, start, current, Optional.empty()))));
 		}
 	}
 
@@ -140,7 +140,7 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 				{
 					resultList.add(MatchResult.of(
 									m.range, Optional.of(
-										callback.onmatch(str, new Range(start, m.range.end), Optional.of(m)))));
+										callback.onmatch(str, start, m.range.end, Optional.of(m)))));
 				}
 				else
 				{

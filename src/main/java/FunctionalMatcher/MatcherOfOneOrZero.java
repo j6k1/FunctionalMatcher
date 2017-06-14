@@ -6,7 +6,7 @@ public class MatcherOfOneOrZero<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
 	protected IMatcher<T> matcher;
 
-	public MatcherOfOneOrZero(IMatcher<T> matcher, IOnMatch<T> callback)
+	public MatcherOfOneOrZero(IOnMatch<T> callback, IMatcher<T> matcher)
 	{
 		if(matcher == null)
 		{
@@ -17,7 +17,7 @@ public class MatcherOfOneOrZero<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(matcher, callback);
+		init(callback, matcher);
 	}
 
 	public MatcherOfOneOrZero(IMatcher<T> matcher)
@@ -27,18 +27,18 @@ public class MatcherOfOneOrZero<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
 		}
 
-		init(matcher, null);
+		init(null, matcher);
 	}
 
-	protected void init(IMatcher<T> matcher, IOnMatch<T> callback)
+	protected void init(IOnMatch<T> callback, IMatcher<T> matcher)
 	{
 		this.matcher = matcher;
 		this.callback = callback;
 	}
 
-	public static <T> MatcherOfOneOrZero<T> of(IMatcher<T> matcher, IOnMatch<T> callback)
+	public static <T> MatcherOfOneOrZero<T> of(IOnMatch<T> callback, IMatcher<T> matcher)
 	{
-		return new MatcherOfOneOrZero<T>(matcher, callback);
+		return new MatcherOfOneOrZero<T>(callback, matcher);
 	}
 
 	public static <T> MatcherOfOneOrZero<T> of(IMatcher<T> matcher)
@@ -82,7 +82,7 @@ public class MatcherOfOneOrZero<T> implements IMatcher<T> {
 						MatchResult.of(
 								new Range(start, start),
 									Optional.of(
-										callback.onmatch(str, new Range(start, start), Optional.empty()))));
+										callback.onmatch(str, start, start, Optional.empty()))));
 			}
 		}
 		else if(callback == null || temporary)
@@ -98,7 +98,7 @@ public class MatcherOfOneOrZero<T> implements IMatcher<T> {
 							Optional.of(
 								callback.onmatch(
 									str,
-									new Range(start, start + result.get().range.end), Optional.empty()))));
+									start, start + result.get().range.end, Optional.empty()))));
 		}
 	}
 }

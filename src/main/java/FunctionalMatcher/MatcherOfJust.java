@@ -6,7 +6,7 @@ public class MatcherOfJust<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
 	protected String value;
 
-	public MatcherOfJust(String value, IOnMatch<T> callback)
+	public MatcherOfJust(IOnMatch<T> callback, String value)
 	{
 		if(value == null)
 		{
@@ -17,7 +17,7 @@ public class MatcherOfJust<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(value, callback);
+		init(callback, value);
 	}
 
 	public MatcherOfJust(String value)
@@ -27,18 +27,18 @@ public class MatcherOfJust<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument value is null.");
 		}
 
-		init(value, null);
+		init(null, value);
 	}
 
-	protected void init(String value, IOnMatch<T> callback)
+	protected void init(IOnMatch<T> callback, String value)
 	{
 		this.value = value;
 		this.callback = callback;
 	}
 
-	public static <T> MatcherOfJust<T> of(String value, IOnMatch<T> callback)
+	public static <T> MatcherOfJust<T> of(IOnMatch<T> callback, String value)
 	{
-		return new MatcherOfJust<T>(value, callback);
+		return new MatcherOfJust<T>(callback, value);
 	}
 
 	public static MatcherOfJust<Nothing> of(String value)
@@ -77,7 +77,7 @@ public class MatcherOfJust<T> implements IMatcher<T> {
 								Optional.of(
 									callback.onmatch(
 											str,
-											new Range(start, start + value.length()), Optional.empty()))));
+											start, start + value.length(), Optional.empty()))));
 		}
 	}
 }

@@ -2,5 +2,5 @@ package FunctionalMatcher;
 
 @FunctionalInterface
 public interface IOnListMatch<T> {
-	public T onmatch(String str, Range range, MatchResultList<T> lst);
+	public T onmatch(String str, int start, int end, MatchResultList<T> lst);
 }

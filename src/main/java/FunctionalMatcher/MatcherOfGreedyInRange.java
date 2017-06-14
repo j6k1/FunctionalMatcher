@@ -9,8 +9,8 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 	protected IOnMatch<T> callback;
 	protected IContinuationMatcher<T> matcher;
 
-	public MatcherOfGreedyInRange(IContinuationMatcher<T> matcher,
-										int startTimes, int endTimes, IOnMatch<T> callback)
+	public MatcherOfGreedyInRange(IOnMatch<T> callback, IContinuationMatcher<T> matcher,
+										int startTimes, int endTimes)
 	{
 		if(matcher == null)
 		{
@@ -21,7 +21,7 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(matcher, startTimes, endTimes, callback);
+		init(callback, matcher, startTimes, endTimes);
 	}
 
 	public MatcherOfGreedyInRange(IContinuationMatcher<T> matcher, int startTimes, int endTimes)
@@ -31,10 +31,10 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
 		}
 
-		init(matcher, startTimes, endTimes, null);
+		init(null, matcher, startTimes, endTimes);
 	}
 
-	protected void init(IContinuationMatcher<T> matcher, int startTimes, int endTimes, IOnMatch<T> callback)
+	protected void init(IOnMatch<T> callback, IContinuationMatcher<T> matcher, int startTimes, int endTimes)
 	{
 		if(startTimes < 0)
 		{
@@ -50,10 +50,10 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 		this.callback = callback;
 	}
 
-	public static <T> MatcherOfGreedyInRange<T> of(IContinuationMatcher<T> matcher,
-													int startTimes, int endTimes, IOnMatch<T> callback)
+	public static <T> MatcherOfGreedyInRange<T> of(IOnMatch<T> callback, IContinuationMatcher<T> matcher,
+													int startTimes, int endTimes)
 	{
-		return new MatcherOfGreedyInRange<T>(matcher, startTimes, endTimes, callback);
+		return new MatcherOfGreedyInRange<T>(callback, matcher, startTimes, endTimes);
 	}
 
 	public static <T> MatcherOfGreedyInRange<T> of(IContinuationMatcher<T> matcher,
@@ -131,7 +131,7 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 					MatchResult.of(
 							new Range(start, current),
 								Optional.of(
-									callback.onmatch(str, new Range(start, current), Optional.empty()))));
+									callback.onmatch(str, start, current, Optional.empty()))));
 		}
 	}
 
@@ -169,7 +169,7 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 				{
 					resultList.add(MatchResult.of(m.range,
 									Optional.of(
-										callback.onmatch(str, new Range(start, m.range.end), Optional.of(m)))));
+										callback.onmatch(str, start, m.range.end, Optional.of(m)))));
 				}
 				else
 				{

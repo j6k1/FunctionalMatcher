@@ -7,7 +7,7 @@ public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
 	protected final ArrayList<IMatcherOfCharacterClass<T>> matcherList = new ArrayList<>();
 
-	public MatcherOfCharacterClassMultiple(ArrayList<IMatcherOfCharacterClass<T>> matcherList, IOnMatch<T> callback)
+	public MatcherOfCharacterClassMultiple(IOnMatch<T> callback, ArrayList<IMatcherOfCharacterClass<T>> matcherList)
 	{
 		if(matcherList == null)
 		{
@@ -18,7 +18,7 @@ public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(matcherList, callback);
+		init(callback, matcherList);
 	}
 
 	public MatcherOfCharacterClassMultiple(ArrayList<IMatcherOfCharacterClass<T>> matcherList)
@@ -28,10 +28,10 @@ public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument matcherList is null.");
 		}
 
-		init(matcherList, null);
+		init(null, matcherList);
 	}
 
-	public MatcherOfCharacterClassMultiple(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
+	public MatcherOfCharacterClassMultiple(IOnMatch<T> callback, IMatcherOfCharacterClass<T> matcher)
 	{
 		if(matcher == null)
 		{
@@ -45,7 +45,7 @@ public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 		ArrayList<IMatcherOfCharacterClass<T>> lst = new ArrayList<IMatcherOfCharacterClass<T>>();
 		lst.add(matcher);
 
-		init(lst, callback);
+		init(callback, lst);
 	}
 
 	public MatcherOfCharacterClassMultiple(IOnMatch<T> callback)
@@ -55,7 +55,7 @@ public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(new ArrayList<IMatcherOfCharacterClass<T>>(), callback);
+		init(callback, new ArrayList<IMatcherOfCharacterClass<T>>());
 	}
 
 	public MatcherOfCharacterClassMultiple(IMatcherOfCharacterClass<T> matcher)
@@ -67,18 +67,18 @@ public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 
 		ArrayList<IMatcherOfCharacterClass<T>> lst = new ArrayList<IMatcherOfCharacterClass<T>>();
 		lst.add(matcher);
-		init(lst, null);
+		init(null, lst);
 	}
 
-	protected void init(ArrayList<IMatcherOfCharacterClass<T>> matcherList, IOnMatch<T> callback)
+	protected void init(IOnMatch<T> callback, ArrayList<IMatcherOfCharacterClass<T>> matcherList)
 	{
 		this.matcherList.addAll(matcherList);
 		this.callback = callback;
 	}
 
-	public static <T> MatcherOfCharacterClassMultiple<T> of(ArrayList<IMatcherOfCharacterClass<T>> matcherList, IOnMatch<T> callback)
+	public static <T> MatcherOfCharacterClassMultiple<T> of(IOnMatch<T> callback, ArrayList<IMatcherOfCharacterClass<T>> matcherList)
 	{
-		return new MatcherOfCharacterClassMultiple<T>(matcherList, callback);
+		return new MatcherOfCharacterClassMultiple<T>(callback, matcherList);
 	}
 
 	public static <T> MatcherOfCharacterClassMultiple<T> of(ArrayList<IMatcherOfCharacterClass<T>> matcherList)
@@ -86,9 +86,9 @@ public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 		return new MatcherOfCharacterClassMultiple<T>(matcherList);
 	}
 
-	public static <T> MatcherOfCharacterClassMultiple<T> of(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
+	public static <T> MatcherOfCharacterClassMultiple<T> of(IOnMatch<T> callback, IMatcherOfCharacterClass<T> matcher)
 	{
-		return new MatcherOfCharacterClassMultiple<T>(matcher, callback);
+		return new MatcherOfCharacterClassMultiple<T>(callback, matcher);
 	}
 
 	public static <T> MatcherOfCharacterClassMultiple<T> of(IOnMatch<T> callback)
@@ -162,9 +162,8 @@ public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 								MatchResult.of(
 										new Range(start, m.range.end),
 											Optional.of(
-												callback.onmatch(str,
-														new Range(start, m.range.end),
-														Optional.of(m)))));
+												callback.onmatch(str, start, m.range.end,
+																				Optional.of(m)))));
 					}
 				}
 			}

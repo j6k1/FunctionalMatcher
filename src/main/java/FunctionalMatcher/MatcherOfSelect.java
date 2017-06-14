@@ -7,7 +7,7 @@ public class MatcherOfSelect<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
 	protected ArrayList<IMatcher<T>> matcherList;
 
-	public MatcherOfSelect(ArrayList<IMatcher<T>> matcherList, IOnMatch<T> callback)
+	public MatcherOfSelect(IOnMatch<T> callback, ArrayList<IMatcher<T>> matcherList)
 	{
 		if(matcherList == null)
 		{
@@ -18,7 +18,7 @@ public class MatcherOfSelect<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(matcherList, callback);
+		init(callback, matcherList);
 	}
 
 	public MatcherOfSelect(ArrayList<IMatcher<T>> matcherList)
@@ -28,10 +28,10 @@ public class MatcherOfSelect<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument matcherList is null.");
 		}
 
-		init(matcherList, null);
+		init(null, matcherList);
 	}
 
-	public MatcherOfSelect(IMatcher<T> matcher, IOnMatch<T> callback)
+	public MatcherOfSelect(IOnMatch<T> callback, IMatcher<T> matcher)
 	{
 		if(matcher == null)
 		{
@@ -44,7 +44,7 @@ public class MatcherOfSelect<T> implements IMatcher<T> {
 
 		ArrayList<IMatcher<T>> lst = new ArrayList<IMatcher<T>>();
 		lst.add(matcher);
-		init(lst, callback);
+		init(callback, lst);
 	}
 
 	public MatcherOfSelect(IOnMatch<T> callback)
@@ -54,7 +54,7 @@ public class MatcherOfSelect<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(new ArrayList<IMatcher<T>>(), callback);
+		init(callback, new ArrayList<IMatcher<T>>());
 	}
 
 	public MatcherOfSelect(IMatcher<T> matcher)
@@ -66,18 +66,18 @@ public class MatcherOfSelect<T> implements IMatcher<T> {
 
 		ArrayList<IMatcher<T>> lst = new ArrayList<IMatcher<T>>();
 		lst.add(matcher);
-		init(lst, null);
+		init(null, lst);
 	}
 
-	protected void init(ArrayList<IMatcher<T>> matcherList, IOnMatch<T> callback)
+	protected void init(IOnMatch<T> callback, ArrayList<IMatcher<T>> matcherList)
 	{
 		this.matcherList = matcherList;
 		this.callback = callback;
 	}
 
-	public static <T> MatcherOfSelect<T> of(ArrayList<IMatcher<T>> matcherList, IOnMatch<T> callback)
+	public static <T> MatcherOfSelect<T> of(IOnMatch<T> callback, ArrayList<IMatcher<T>> matcherList)
 	{
-		return new MatcherOfSelect<T>(matcherList, callback);
+		return new MatcherOfSelect<T>(callback, matcherList);
 	}
 
 	public static <T> MatcherOfSelect<T> of(ArrayList<IMatcher<T>> matcherList)
@@ -85,9 +85,9 @@ public class MatcherOfSelect<T> implements IMatcher<T> {
 		return new MatcherOfSelect<T>(matcherList);
 	}
 
-	public static <T> MatcherOfSelect<T> of(IMatcher<T> matcher, IOnMatch<T> callback)
+	public static <T> MatcherOfSelect<T> of(IOnMatch<T> callback, IMatcher<T> matcher)
 	{
-		return new MatcherOfSelect<T>(matcher, callback);
+		return new MatcherOfSelect<T>(callback, matcher);
 	}
 
 	public static <T> MatcherOfSelect<T> of(IOnMatch<T> callback)
@@ -158,7 +158,7 @@ public class MatcherOfSelect<T> implements IMatcher<T> {
 										new Range(start, m.range.end),
 											Optional.of(
 												callback.onmatch(
-													str, new Range(start, m.range.end), Optional.of(m)))));
+													str, start, m.range.end, Optional.of(m)))));
 
 					}
 				}

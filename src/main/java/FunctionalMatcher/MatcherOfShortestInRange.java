@@ -10,8 +10,10 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 	protected IMatcher<T> matcher;
 	protected IMatcher<T> anchor;
 
-	public MatcherOfShortestInRange(IMatcher<T> matcher, IMatcher<T> anchor,
-										int startTimes, int endTimes, IOnMatch<T> callback)
+	public MatcherOfShortestInRange(IOnMatch<T> callback,
+										IMatcher<T> matcher,
+										IMatcher<T> anchor,
+										int startTimes, int endTimes)
 	{
 		if(matcher == null)
 		{
@@ -26,7 +28,7 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(matcher, anchor, startTimes, endTimes, callback);
+		init(callback, matcher, anchor, startTimes, endTimes);
 	}
 
 	public MatcherOfShortestInRange(IMatcher<T> matcher, IMatcher<T> anchor,
@@ -41,11 +43,12 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 			throw new NullReferenceNotAllowedException("The reference to the argument anchor is null.");
 		}
 
-		init(matcher, anchor, startTimes, endTimes, null);
+		init(null, matcher, anchor, startTimes, endTimes);
 	}
 
-	protected void init(IMatcher<T> matcher, IMatcher<T> anchor,
-										int startTimes, int endTimes, IOnMatch<T> callback)
+	protected void init(IOnMatch<T> callback,
+						IMatcher<T> matcher, IMatcher<T> anchor,
+										int startTimes, int endTimes)
 	{
 		if(startTimes < 0)
 		{
@@ -62,10 +65,12 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 		this.callback = callback;
 	}
 
-	public static <T> MatcherOfShortestInRange<T> of(IMatcher<T> matcher, IMatcher<T> anchor,
-												int startTimes, int endTimes, IOnMatch<T> callback)
+	public static <T> MatcherOfShortestInRange<T> of(IOnMatch<T> callback,
+												IMatcher<T> matcher,
+												IMatcher<T> anchor,
+												int startTimes, int endTimes)
 	{
-		return new MatcherOfShortestInRange<T>(matcher, anchor, startTimes, endTimes, callback);
+		return new MatcherOfShortestInRange<T>(callback, matcher, anchor, startTimes, endTimes);
 	}
 
 	public static <T> MatcherOfShortestInRange<T> of(IMatcher<T> matcher, IMatcher<T> anchor,
@@ -114,7 +119,7 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 										new Range(start, current),
 											Optional.of(
 												callback.onmatch(
-													str, new Range(start, m.range.end), Optional.empty()))));
+													str, start, m.range.end, Optional.empty()))));
 					}
 				}
 				if(current == m.range.end) break;
@@ -174,7 +179,7 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 				{
 					resultList.add(MatchResult.of(
 									m.range, Optional.of(
-										callback.onmatch(str, new Range(start, m.range.end), Optional.of(m)))));
+										callback.onmatch(str, start, m.range.end, Optional.of(m)))));
 				}
 				else
 				{

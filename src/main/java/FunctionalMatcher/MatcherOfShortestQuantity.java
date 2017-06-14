@@ -9,8 +9,9 @@ public abstract class MatcherOfShortestQuantity<T> implements IMatcher<T>, IList
 	protected IMatcher<T> matcher;
 	protected IMatcher<T> anchor;
 
-	public MatcherOfShortestQuantity(IMatcher<T> matcher, IMatcher<T> anchor,
-										int startTimes, IOnMatch<T> callback)
+	public MatcherOfShortestQuantity(IOnMatch<T> callback,
+										IMatcher<T> matcher,
+										IMatcher<T> anchor, int startTimes)
 	{
 		if(matcher == null)
 		{
@@ -25,7 +26,7 @@ public abstract class MatcherOfShortestQuantity<T> implements IMatcher<T>, IList
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(matcher, anchor, startTimes, callback);
+		init(callback, matcher, anchor, startTimes);
 	}
 
 	public MatcherOfShortestQuantity(IMatcher<T> matcher, IMatcher<T> anchor, int startTimes)
@@ -39,11 +40,13 @@ public abstract class MatcherOfShortestQuantity<T> implements IMatcher<T>, IList
 			throw new NullReferenceNotAllowedException("The reference to the argument anchor is null.");
 		}
 
-		init(matcher, anchor, startTimes, null);
+		init(null, matcher, anchor, startTimes);
 	}
 
-	protected void init(IMatcher<T> matcher, IMatcher<T> anchor,
-										int startTimes, IOnMatch<T> callback)
+	protected void init(IOnMatch<T> callback,
+						IMatcher<T> matcher,
+						IMatcher<T> anchor,
+										int startTimes)
 	{
 		if(startTimes < 0)
 		{
@@ -95,7 +98,7 @@ public abstract class MatcherOfShortestQuantity<T> implements IMatcher<T>, IList
 										new Range(start, current),
 											Optional.of(
 												callback.onmatch(
-													str, new Range(start, m.range.end), Optional.empty()))));
+													str, start, m.range.end, Optional.empty()))));
 					}
 				}
 				if(current == m.range.end) break;
@@ -156,7 +159,7 @@ public abstract class MatcherOfShortestQuantity<T> implements IMatcher<T>, IList
 					resultList.add(MatchResult.of(
 									m.range, Optional.of(
 										callback.onmatch(
-											str, new Range(start, m.range.end), Optional.of(m)))));
+											str, start, m.range.end, Optional.of(m)))));
 				}
 				else
 				{

@@ -9,8 +9,8 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 	protected IMatcher<T> matcher;
 	protected IMatcher<T> anchor;
 
-	public MatcherOfLongestQuantity(IMatcher<T> matcher, IMatcher<T> anchor,
-										int startTimes, IOnMatch<T> callback)
+	public MatcherOfLongestQuantity(IOnMatch<T> callback,
+										IMatcher<T> matcher, IMatcher<T> anchor, int startTimes)
 	{
 		if(matcher == null)
 		{
@@ -25,7 +25,7 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(matcher, anchor, startTimes, callback);
+		init(callback, matcher, anchor, startTimes);
 	}
 
 	public MatcherOfLongestQuantity(IMatcher<T> matcher, IMatcher<T> anchor, int startTimes)
@@ -39,11 +39,11 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 			throw new NullReferenceNotAllowedException("The reference to the argument anchor is null.");
 		}
 
-		init(matcher, anchor, startTimes, null);
+		init(null, matcher, anchor, startTimes);
 	}
 
-	protected void init(IMatcher<T> matcher, IMatcher<T> anchor,
-										int startTimes, IOnMatch<T> callback)
+	protected void init(IOnMatch<T> callback,
+										IMatcher<T> matcher, IMatcher<T> anchor, int startTimes)
 	{
 		if(startTimes < 0)
 		{
@@ -119,7 +119,7 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 							new Range(start, lastEnd),
 								Optional.of(
 										callback.onmatch(
-												str, new Range(start, lastEnd), Optional.empty()))));
+												str, start, lastEnd, Optional.empty()))));
 		}
 	}
 
@@ -166,7 +166,7 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 							resultList.add(MatchResult.of(
 											m.range, Optional.of(
 												callback.onmatch(
-														str, new Range(start, m.range.end), Optional.of(t)))));
+														str, start, m.range.end, Optional.of(t)))));
 						}
 					}
 					else

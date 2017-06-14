@@ -139,74 +139,81 @@ public class MatcherOfFoldTest {
 	public void testMatch() {
 		assertThat(MatcherExecutor.exec(csv,
 				(str, start, temporary) -> {
-					return (new MatcherOfFold<ICsv>(new MatcherOfGreedyZeroOrMore<ICsv>(
+					return (new MatcherOfFold<ICsv>((str1, start1, end1, lst) -> {
+						CsvDocument csv = new CsvDocument();
+						lst.stream().forEach(row -> {
+							csv.add((CsvRow)row.value.get());
+						});
+						return (ICsv)csv;
+					},
+					new MatcherOfGreedyZeroOrMore<ICsv>(
 						(str1, start1, temporary1) -> {
-							return (new MatcherOfFold<ICsv>(new MatcherOfGreedyZeroOrMore<ICsv>(
+							return (new MatcherOfFold<ICsv>(
+								(str2, start2, end2, lst) -> {
+									CsvRow row = new CsvRow();
+									lst.stream().forEach(f -> row.add(((CsvField)f.value.get())));
+									return (ICsv)row;
+								}, new MatcherOfGreedyZeroOrMore<ICsv>(
 								(str2, start2, temporary2) -> {
 									return (new MatcherOfSelect<ICsv>(
 										(String str3, int start3, boolean temporary3) -> {
 											return (new MatcherOfJust<ICsv>("\""))
 													.match(str, start3, temporary3).flatMap(r0 -> {
 														return (new MatcherOfGreedyZeroOrMore<ICsv>(
-															IContinuationMatcher.of(new MatcherOfSelect<ICsv>(
+															(str4, start4, end4, m) -> {
+																return (ICsv)new CsvField(
+																					str.substring(start4, end4)
+																						.replace("\"\"", "\""));
+															},
+															IContinuationMatcher.of((new MatcherOfSelect<ICsv>(
 																new MatcherOfJust<ICsv>("\"\"")
-															)
-															.add(new MatcherOfNegativeCharacterClass<ICsv>(
+															)).add(new MatcherOfNegativeCharacterClass<ICsv>(
 																new MatcherOfAsciiCharacterClass<ICsv>("\"")
-															))
-														),
-														(str4, range, m) -> {
-															return (ICsv)new CsvField(
-																				str.substring(range.start, range.end)
-																					.replace("\"\"", "\""));
-														})
-														.match(str, r0.range.end, temporary3)
-														.flatMap(r1 -> r1.next(str, new MatcherOfJust<ICsv>("\"")).map(r2 -> {
-															return MatchResult.of(r0.range.compositeOf(r2.range), r1.value);
-														})));
+															)))
+														)).match(str, r0.range.end, temporary3)
+														.flatMap(r1 -> {
+															return r1.next(str, new MatcherOfJust<ICsv>("\"")).map(r2 -> {
+																return MatchResult.of(r0.range.compositeOf(r2.range), r1.value);
+															});
+														});
 													});
 
 										}
-									).add(new MatcherOfGreedyZeroOrMore<ICsv>(IContinuationMatcher.of(
-										new MatcherOfNegativeCharacterClass<ICsv>(
-											new MatcherOfAsciiCharacterClass<ICsv>(",\r\n")
+									)).add(new MatcherOfGreedyZeroOrMore<ICsv>(
+										(str3, start3, end3, m) -> {
+											return (ICsv)new CsvField(str.substring(start3, end3));
+										}, IContinuationMatcher.of(
+											new MatcherOfNegativeCharacterClass<ICsv>(
+												new MatcherOfAsciiCharacterClass<ICsv>(",\r\n")
+											)
 										)
-									),
-									(str3, range, m) -> {
-										return (ICsv)new CsvField(str.substring(range.start, range.end));
-									}))
-								).match(str, start2, temporary2)
-								.flatMap(r0 -> {
-									return r0.next(str, (new MatcherOfSelect<Boolean>(
-										new MatcherOfJust<Boolean>(",")
-									)).add(new MatcherOfAsciiCharacterClass<Boolean>(
-											"\r\n", (str3, range, m) -> true)
-									).add(new MatcherOfEndOfContent<Boolean>((str3, range, m) -> true)
-									)).map(r1 -> {
-										if(r1.value.orElse(false))
-										{
-											return Termination.of(r0.compositeOf(r1.range.end));
-										}
-										else
-										{
-											return Continuation.of(r0.compositeOf(r1.range.end));
-										}
+									)).match(str, start2, temporary2)
+									.flatMap(r0 -> {
+										return r0.next(str, (new MatcherOfSelect<Boolean>(
+												new MatcherOfJust<Boolean>(",")
+											)).add(new MatcherOfAsciiCharacterClass<Boolean>(
+													(str3, start3, end3, m) -> true, "\r\n")
+											).add(new MatcherOfEndOfContent<Boolean>((str3, start3, end3, m) -> true))
+										).map(r1 -> {
+											if(r1.value.orElse(false))
+											{
+												return Termination.of(r0.compositeOf(r1.range.end));
+											}
+											else
+											{
+												return Continuation.of(r0.compositeOf(r1.range.end));
+											}
+										});
 									});
-								});
-							}),
-							(str2, range, lst) -> {
-								CsvRow row = new CsvRow();
-								lst.stream().forEach(f -> row.add(((CsvField)f.value.get())));
-
-								return (ICsv)row;
-							}
+								}
+							)
 						)).match(str, start1, temporary1)
 						.flatMap(r0 -> {
 							return r0.next(str,
 								(new MatcherOfSelect<Boolean>(
-									new MatcherOfAsciiCharacterClass<Boolean>(",\r\n", (str2, range, m) -> false)
-								)
-								.add(new MatcherOfEndOfContent<Boolean>((str2, range, m) -> true)))
+									new MatcherOfAsciiCharacterClass<Boolean>((str2, start2, end2, m) -> false, ",\r\n")
+								))
+								.add(new MatcherOfEndOfContent<Boolean>((str2, start2, end2, m) -> true))
 							)
 							.map(r1 -> {
 								if(r1.value.orElse(false))
@@ -219,14 +226,7 @@ public class MatcherOfFoldTest {
 								}
 							});
 						});
-					}),
-					(str1, r, lst) -> {
-						CsvDocument csv = new CsvDocument();
-						lst.stream().forEach(row -> {
-							csv.add((CsvRow)row.value.get());
-						});
-						return csv;
-					}
+					})
 				)).match(str, start, temporary)
 				.flatMap(r0 -> {
 					return r0.next(str, new MatcherOfEndOfContent<ICsv>()).map(r1 -> r0);

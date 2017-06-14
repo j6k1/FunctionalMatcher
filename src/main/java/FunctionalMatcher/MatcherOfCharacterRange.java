@@ -7,22 +7,22 @@ public class MatcherOfCharacterRange<T> implements IMatcherOfCharacterClass<T> {
 	protected char codeStart;
 	protected char codeEnd;
 
-	public MatcherOfCharacterRange(char codeStart, char codeEnd, IOnMatch<T> callback)
+	public MatcherOfCharacterRange(IOnMatch<T> callback, char codeStart, char codeEnd)
 	{
 		if(callback == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(codeStart, codeEnd, callback);
+		init(callback, codeStart, codeEnd);
 	}
 
 	public MatcherOfCharacterRange(char codeStart, char codeEnd)
 	{
-		init(codeStart, codeEnd, null);
+		init(null, codeStart, codeEnd);
 	}
 
-	protected void init(char codeStart, char codeEnd, IOnMatch<T> callback)
+	protected void init(IOnMatch<T> callback, char codeStart, char codeEnd)
 	{
 		if(codeStart > codeEnd)
 		{
@@ -33,9 +33,9 @@ public class MatcherOfCharacterRange<T> implements IMatcherOfCharacterClass<T> {
 		this.callback = callback;
 	}
 
-	public static <T> MatcherOfCharacterRange<T> of(char codeStart, char codeEnd, IOnMatch<T> callback)
+	public static <T> MatcherOfCharacterRange<T> of(IOnMatch<T> callback, char codeStart, char codeEnd)
 	{
-		return new MatcherOfCharacterRange<T>(codeStart, codeEnd, callback);
+		return new MatcherOfCharacterRange<T>(callback, codeStart, codeEnd);
 	}
 
 	public static MatcherOfCharacterRange<Nothing> of(char codeStart, char codeEnd)
@@ -76,7 +76,7 @@ public class MatcherOfCharacterRange<T> implements IMatcherOfCharacterClass<T> {
 							new Range(start, start + 1),
 								Optional.of(
 									callback.onmatch(str,
-										new Range(start, start + 1), Optional.empty()))));
+										start, start + 1, Optional.empty()))));
 		}
 	}
 

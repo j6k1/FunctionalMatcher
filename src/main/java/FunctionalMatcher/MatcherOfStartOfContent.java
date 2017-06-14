@@ -65,7 +65,7 @@ public class MatcherOfStartOfContent<T> implements IMatcher<T> {
 					MatchResult.of(
 							new Range(start, start),
 								Optional.of(
-									callback.onmatch(str, new Range(start, start), Optional.empty()))));
+									callback.onmatch(str, start, start, Optional.empty()))));
 		}
 	}
 }

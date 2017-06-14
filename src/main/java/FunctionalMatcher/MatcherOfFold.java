@@ -6,7 +6,7 @@ public class MatcherOfFold<T> implements IMatcher<T> {
 	protected IOnListMatch<T> callback;
 	protected IListMatcher<T> matcher;
 
-	public MatcherOfFold(IListMatcher<T> matcher, IOnListMatch<T> callback)
+	public MatcherOfFold(IOnListMatch<T> callback, IListMatcher<T> matcher)
 	{
 		if(matcher == null)
 		{
@@ -17,18 +17,18 @@ public class MatcherOfFold<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(matcher, callback);
+		init(callback, matcher);
 	}
 
-	protected void init(IListMatcher<T> matcher, IOnListMatch<T> callback)
+	protected void init(IOnListMatch<T> callback, IListMatcher<T> matcher)
 	{
 		this.matcher = matcher;
 		this.callback = callback;
 	}
 
-	public static <T> MatcherOfFold<T> of(IListMatcher<T> matcher, IOnListMatch<T> callback)
+	public static <T> MatcherOfFold<T> of(IOnListMatch<T> callback, IListMatcher<T> matcher)
 	{
-		return new MatcherOfFold<T>(matcher, callback);
+		return new MatcherOfFold<T>(callback, matcher);
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class MatcherOfFold<T> implements IMatcher<T> {
 			{
 				MatchResultList<T> m = result.get();
 
-				return Optional.of(MatchResult.of(m.range, Optional.of(callback.onmatch(str, m.range, m))));
+				return Optional.of(MatchResult.of(m.range, Optional.of(callback.onmatch(str, m.range.start, m.range.end, m))));
 			}
 		}
 	}

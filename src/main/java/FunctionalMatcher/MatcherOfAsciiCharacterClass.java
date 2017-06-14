@@ -12,7 +12,7 @@ public class MatcherOfAsciiCharacterClass<T> implements IMatcherOfCharacterClass
 		Arrays.fill(characterMap, false);
 	}
 
-	public MatcherOfAsciiCharacterClass(String characters, IOnMatch<T> callback)
+	public MatcherOfAsciiCharacterClass(IOnMatch<T> callback, String characters)
 	{
 		if(characters == null)
 		{
@@ -23,7 +23,7 @@ public class MatcherOfAsciiCharacterClass<T> implements IMatcherOfCharacterClass
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(characters, callback);
+		init(callback, characters);
 	}
 
 	protected MatcherOfAsciiCharacterClass(String characters)
@@ -33,10 +33,10 @@ public class MatcherOfAsciiCharacterClass<T> implements IMatcherOfCharacterClass
 			throw new NullReferenceNotAllowedException("The reference to the argument characters is null.");
 		}
 
-		init(characters, null);
+		init(null, characters);
 	}
 
-	protected void init(String characters, IOnMatch<T> callback)
+	protected void init(IOnMatch<T> callback, String characters)
 	{
 		char[] chars = characters.toCharArray();
 
@@ -52,9 +52,9 @@ public class MatcherOfAsciiCharacterClass<T> implements IMatcherOfCharacterClass
 		this.callback = callback;
 	}
 
-	public static <T> MatcherOfAsciiCharacterClass<T> of(String characters, IOnMatch<T> callback)
+	public static <T> MatcherOfAsciiCharacterClass<T> of(IOnMatch<T> callback, String characters)
 	{
-		return new MatcherOfAsciiCharacterClass<T>(characters, callback);
+		return new MatcherOfAsciiCharacterClass<T>(callback, characters);
 	}
 
 	public static MatcherOfAsciiCharacterClass<Nothing> of(String characters)
@@ -92,7 +92,7 @@ public class MatcherOfAsciiCharacterClass<T> implements IMatcherOfCharacterClass
 					MatchResult.of(
 							new Range(start, start + 1),
 								Optional.of(callback.onmatch(str,
-											new Range(start, start + 1), Optional.empty()))));
+											start, start + 1, Optional.empty()))));
 		}
 	}
 }

@@ -6,7 +6,7 @@ public class MatcherOfNegativeCharacterClass<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
 	protected IMatcherOfCharacterClass<T> matcher;
 
-	public MatcherOfNegativeCharacterClass(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
+	public MatcherOfNegativeCharacterClass(IOnMatch<T> callback, IMatcherOfCharacterClass<T> matcher)
 	{
 		if(matcher == null)
 		{
@@ -17,7 +17,7 @@ public class MatcherOfNegativeCharacterClass<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(matcher, callback);
+		init(callback, matcher);
 	}
 
 	public MatcherOfNegativeCharacterClass(IMatcherOfCharacterClass<T> matcher)
@@ -27,16 +27,16 @@ public class MatcherOfNegativeCharacterClass<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
 		}
 
-		init(matcher, null);
+		init(null, matcher);
 	}
 
-	protected void init(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
+	protected void init(IOnMatch<T> callback, IMatcherOfCharacterClass<T> matcher)
 	{
 		this.matcher = matcher;
 		this.callback = callback;
 	}
 
-	public static <T> MatcherOfNegativeCharacterClass<T> of(IMatcherOfCharacterClass<T> matcher, IOnMatch<T> callback)
+	public static <T> MatcherOfNegativeCharacterClass<T> of(IOnMatch<T> callback, IMatcherOfCharacterClass<T> matcher)
 	{
 		if(matcher == null)
 		{
@@ -47,7 +47,7 @@ public class MatcherOfNegativeCharacterClass<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		return new MatcherOfNegativeCharacterClass<T>(matcher, callback);
+		return new MatcherOfNegativeCharacterClass<T>(callback, matcher);
 	}
 
 	public static <T> MatcherOfNegativeCharacterClass<T> of(IMatcherOfCharacterClass<T> matcher)
@@ -82,7 +82,7 @@ public class MatcherOfNegativeCharacterClass<T> implements IMatcher<T> {
 							new Range(start, start + 1),
 								Optional.of(
 									callback.onmatch(
-											str, new Range(start, start + 1), Optional.empty()))));
+											str, start, start + 1, Optional.empty()))));
 		}
 	}
 }

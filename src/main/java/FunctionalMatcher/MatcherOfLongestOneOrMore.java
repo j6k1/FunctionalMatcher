@@ -1,9 +1,9 @@
 package FunctionalMatcher;
 
 public class MatcherOfLongestOneOrMore<T> extends MatcherOfLongestQuantity<T> {
-	public MatcherOfLongestOneOrMore(IMatcher<T> matcher, IMatcher<T> anchor, IOnMatch<T> callback)
+	public MatcherOfLongestOneOrMore(IOnMatch<T> callback, IMatcher<T> matcher, IMatcher<T> anchor)
 	{
-		super(matcher, anchor, 1, callback);
+		super(callback, matcher, anchor, 1);
 	}
 
 	public MatcherOfLongestOneOrMore(IMatcher<T> matcher, IMatcher<T> anchor)
@@ -11,10 +11,10 @@ public class MatcherOfLongestOneOrMore<T> extends MatcherOfLongestQuantity<T> {
 		super(matcher, anchor, 1);
 	}
 
-	public static <T> MatcherOfLongestOneOrMore<T> of(IMatcher<T> matcher,
-														IMatcher<T> anchor, IOnMatch<T> callback)
+	public static <T> MatcherOfLongestOneOrMore<T> of(IOnMatch<T> callback,
+														IMatcher<T> matcher, IMatcher<T> anchor)
 	{
-		return new MatcherOfLongestOneOrMore<T>(matcher, anchor, callback);
+		return new MatcherOfLongestOneOrMore<T>(callback, matcher, anchor);
 	}
 
 	public static <T> MatcherOfLongestOneOrMore<T> of(IMatcher<T> matcher, IMatcher<T> anchor)

@@ -7,7 +7,7 @@ public class MatcherOfCharacterClass<T> implements IMatcherOfCharacterClass<T> {
 	protected IOnMatch<T> callback;
 	protected final HashSet<Character> charactersSet = new HashSet<>();
 
-	public MatcherOfCharacterClass(String characters, IOnMatch<T> callback)
+	public MatcherOfCharacterClass(IOnMatch<T> callback, String characters)
 	{
 		if(characters == null)
 		{
@@ -18,7 +18,7 @@ public class MatcherOfCharacterClass<T> implements IMatcherOfCharacterClass<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(characters, callback);
+		init(callback, characters);
 	}
 
 	public MatcherOfCharacterClass(String characters)
@@ -28,19 +28,19 @@ public class MatcherOfCharacterClass<T> implements IMatcherOfCharacterClass<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument characters is null.");
 		}
 
-		init(characters, null);
+		init(null, characters);
 	}
 
-	protected void init(String characters, IOnMatch<T> callback)
+	protected void init(IOnMatch<T> callback, String characters)
 	{
 		char[] chars = characters.toCharArray();
 		for(char c: chars) charactersSet.add(c);
 		this.callback = callback;
 	}
 
-	public static <T> MatcherOfCharacterClass<T> of(String characters, IOnMatch<T> callback)
+	public static <T> MatcherOfCharacterClass<T> of(IOnMatch<T> callback, String characters)
 	{
-		return new MatcherOfCharacterClass<T>(characters, callback);
+		return new MatcherOfCharacterClass<T>(callback, characters);
 	}
 
 	public static <T> MatcherOfCharacterClass<T> of(String characters)
@@ -75,7 +75,7 @@ public class MatcherOfCharacterClass<T> implements IMatcherOfCharacterClass<T> {
 					MatchResult.of(
 							new Range(start, start + 1),
 								Optional.of(callback.onmatch(str,
-											new Range(start, start + 1), Optional.empty()))));
+											start, start + 1, Optional.empty()))));
 		}
 	}
 }

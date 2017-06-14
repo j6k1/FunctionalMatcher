@@ -8,7 +8,7 @@ public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
 	protected IMatcher<T> matcher;
 	protected int times;
 
-	public MatcherOfRepetition(IMatcher<T> matcher, int times, IOnMatch<T> callback)
+	public MatcherOfRepetition(IOnMatch<T> callback, IMatcher<T> matcher, int times)
 	{
 		if(matcher == null)
 		{
@@ -23,7 +23,7 @@ public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
 			throw new InvalidMatchConditionException("A value less than 1 was specified for the number of matches.");
 		}
 
-		init(matcher, times, callback);
+		init(callback, matcher, times);
 	}
 
 	public MatcherOfRepetition(IMatcher<T> matcher, int times)
@@ -33,19 +33,19 @@ public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
 		}
 
-		init(matcher, times, null);
+		init(null, matcher, times);
 	}
 
-	protected void init(IMatcher<T> matcher, int times, IOnMatch<T> callback)
+	protected void init(IOnMatch<T> callback, IMatcher<T> matcher, int times)
 	{
 		this.matcher = matcher;
 		this.times = times;
 		this.callback = callback;
 	}
 
-	public static <T> MatcherOfRepetition<T> of(IMatcher<T> matcher, int times, IOnMatch<T> callback)
+	public static <T> MatcherOfRepetition<T> of(IOnMatch<T> callback, IMatcher<T> matcher, int times)
 	{
-		return new MatcherOfRepetition<T>(matcher, times, callback);
+		return new MatcherOfRepetition<T>(callback, matcher, times);
 	}
 
 	public static <T> MatcherOfRepetition<T> of(IMatcher<T> matcher, int times)
@@ -99,7 +99,7 @@ public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
 					MatchResult.of(
 							new Range(start, current),
 								Optional.of(
-									callback.onmatch(str, new Range(start, current), Optional.empty()))));
+									callback.onmatch(str, start, current, Optional.empty()))));
 		}
 	}
 
@@ -138,7 +138,7 @@ public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
 			{
 				resultList.add(MatchResult.of(
 								m.range, Optional.of(
-									callback.onmatch(str, new Range(start, current), Optional.of(m)))));
+									callback.onmatch(str, start, current, Optional.of(m)))));
 			}
 			else
 			{

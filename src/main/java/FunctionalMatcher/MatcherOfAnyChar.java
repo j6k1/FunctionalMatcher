@@ -6,35 +6,35 @@ public class MatcherOfAnyChar<T> implements IMatcher<T> {
 	protected IOnMatch<T> callback;
 	protected boolean multiline;
 
-	public MatcherOfAnyChar(boolean multiline, IOnMatch<T> callback)
+	public MatcherOfAnyChar(IOnMatch<T> callback, boolean multiline)
 	{
 		if(callback == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(multiline, callback);
+		init(callback, multiline);
 	}
 
 	public MatcherOfAnyChar(boolean multiline)
 	{
-		init(multiline, null);
+		init(null, multiline);
 	}
 
-	protected void init(boolean multiline, IOnMatch<T> callback)
+	protected void init(IOnMatch<T> callback, boolean multiline)
 	{
 		this.multiline = multiline;
 		this.callback = callback;
 	}
 
-	public static <T> MatcherOfAnyChar<T> of(boolean multiline, IOnMatch<T> callback)
+	public static <T> MatcherOfAnyChar<T> of(IOnMatch<T> callback, boolean multiline)
 	{
 		if(callback == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		return new MatcherOfAnyChar<T>(multiline, callback);
+		return new MatcherOfAnyChar<T>(callback, multiline);
 	}
 
 	public static MatcherOfAnyChar<Nothing> of(boolean multiline)
@@ -69,7 +69,7 @@ public class MatcherOfAnyChar<T> implements IMatcher<T> {
 					MatchResult.of(
 							new Range(start, start + 1),
 								Optional.of(
-									callback.onmatch(str, new Range(start, start + 1), Optional.empty()))));
+									callback.onmatch(str, start, start + 1, Optional.empty()))));
 		}
 		else if(!multiline && l > start && str.charAt(start) != '\n' && str.charAt(start) != '\r')
 		{
@@ -84,7 +84,7 @@ public class MatcherOfAnyChar<T> implements IMatcher<T> {
 								new Range(start, start + 1),
 									Optional.of(
 										callback.onmatch(
-												str, new Range(start, start + 1), Optional.empty()))));
+												str, start, start + 1, Optional.empty()))));
 			}
 		}
 		else
