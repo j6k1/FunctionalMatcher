@@ -77,7 +77,7 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 
 				current = m.range.end;
 
-				if(!r.isContinuation())
+				if(r instanceof ITermination)
 				{
 					if(i < startTimes) return Optional.empty();
 					else break;
@@ -154,7 +154,7 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 
 				current = m.range.end;
 
-				if(!r.isContinuation())
+				if(r instanceof ITermination)
 				{
 					if(i < startTimes) return Optional.empty();
 					else break;

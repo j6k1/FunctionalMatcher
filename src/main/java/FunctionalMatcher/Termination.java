@@ -1,6 +1,6 @@
 package FunctionalMatcher;
 
-public class Termination<T> implements IContinuation<T> {
+public class Termination<T> implements ITermination<T> {
 	protected MatchResult<T> result;
 
 	public Termination(MatchResult<T> result)
@@ -11,11 +11,6 @@ public class Termination<T> implements IContinuation<T> {
 	public static <T> Termination<T> of(MatchResult<T> result)
 	{
 		return new Termination<T>(result);
-	}
-
-	@Override
-	public boolean isContinuation() {
-		return false;
 	}
 
 	@Override

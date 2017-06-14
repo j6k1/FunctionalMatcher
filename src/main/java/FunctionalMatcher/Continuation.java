@@ -14,11 +14,6 @@ public class Continuation<T> implements IContinuation<T> {
 	}
 
 	@Override
-	public boolean isContinuation() {
-		return true;
-	}
-
-	@Override
 	public MatchResult<T> result() {
 		return result;
 	}

@@ -91,7 +91,7 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 				IContinuation<T> r = result.get();
 				MatchResult<T> m = r.result();
 
-				if(!r.isContinuation())
+				if(r instanceof ITermination)
 				{
 					lastEnd = (i < startTimes) ? -1 : m.range.end;
 					break;
@@ -176,7 +176,7 @@ public class MatcherOfGreedyInRange<T> implements IMatcher<T>, IListMatcher<T> {
 					resultList.add(m);
 				}
 
-				if(!r.isContinuation())
+				if(r instanceof ITermination)
 				{
 					lastEnd = (i < startTimes) ? -1 : m.range.end;
 					break;
