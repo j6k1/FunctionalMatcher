@@ -37,6 +37,11 @@ public class MatcherOfAnyChar<T> implements IMatcher<T> {
 		return new MatcherOfAnyChar<T>(callback, multiline);
 	}
 
+	public static <T> MatcherOfAnyChar<T> of(MatchResultType<T> t, boolean multiline)
+	{
+		return new MatcherOfAnyChar<T>(multiline);
+	}
+
 	public static MatcherOfAnyChar<Nothing> of(boolean multiline)
 	{
 		return new MatcherOfAnyChar<Nothing>(multiline);
