@@ -218,7 +218,7 @@ public class MatcherOfFoldTest {
 								.add(MatcherOfEndOfContent.of((str2, start2, end2, m) -> true))
 							)
 							.map(r1 -> {
-								if(r1.value.orElse(true).equals(Boolean.TRUE))
+								if(r1.value.orElse(false).equals(Boolean.TRUE))
 								{
 									return Termination.of(r0.compositeOf(r1.range.end));
 								}
