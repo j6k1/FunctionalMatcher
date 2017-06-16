@@ -43,6 +43,11 @@ public class MatcherOfCharacterClass<T> implements IMatcherOfCharacterClass<T> {
 		return new MatcherOfCharacterClass<T>(callback, characters);
 	}
 
+	public static <T> MatcherOfCharacterClass<T> of(MatchResultType<T> t, String characters)
+	{
+		return new MatcherOfCharacterClass<T>(characters);
+	}
+
 	public static <T> MatcherOfCharacterClass<T> of(String characters)
 	{
 		return new MatcherOfCharacterClass<T>(characters);

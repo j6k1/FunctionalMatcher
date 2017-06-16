@@ -30,6 +30,11 @@ public class MatcherOfTerminateWithNewLine<T> implements IMatcher<T> {
 		return new MatcherOfTerminateWithNewLine<T>(callback);
 	}
 
+	public static <T> MatcherOfTerminateWithNewLine<T> of(MatchResultType<T> t)
+	{
+		return new MatcherOfTerminateWithNewLine<T>();
+	}
+
 	public static MatcherOfTerminateWithNewLine<Nothing> of()
 	{
 		return new MatcherOfTerminateWithNewLine<Nothing>();

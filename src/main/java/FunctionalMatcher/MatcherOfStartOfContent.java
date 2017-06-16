@@ -29,6 +29,11 @@ public class MatcherOfStartOfContent<T> implements IMatcher<T> {
 		return new MatcherOfStartOfContent<T>(callback);
 	}
 
+	public static <T> MatcherOfStartOfContent<T> of(MatchResultType<T> t)
+	{
+		return new MatcherOfStartOfContent<T>();
+	}
+
 	public static MatcherOfStartOfContent<Nothing> of()
 	{
 		return new MatcherOfStartOfContent<Nothing>();

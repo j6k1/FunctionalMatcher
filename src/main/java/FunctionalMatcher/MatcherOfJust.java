@@ -41,6 +41,11 @@ public class MatcherOfJust<T> implements IMatcher<T> {
 		return new MatcherOfJust<T>(callback, value);
 	}
 
+	public static <T> MatcherOfJust<T> of(MatchResultType<T> t, String value)
+	{
+		return new MatcherOfJust<T>(value);
+	}
+
 	public static MatcherOfJust<Nothing> of(String value)
 	{
 		return new MatcherOfJust<Nothing>(value);

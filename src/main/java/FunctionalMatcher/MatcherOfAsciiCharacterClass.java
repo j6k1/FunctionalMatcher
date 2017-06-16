@@ -57,6 +57,11 @@ public class MatcherOfAsciiCharacterClass<T> implements IMatcherOfCharacterClass
 		return new MatcherOfAsciiCharacterClass<T>(callback, characters);
 	}
 
+	public static <T> MatcherOfAsciiCharacterClass<T> of(MatchResultType<T> t, String characters)
+	{
+		return new MatcherOfAsciiCharacterClass<T>(characters);
+	}
+
 	public static MatcherOfAsciiCharacterClass<Nothing> of(String characters)
 	{
 		return new MatcherOfAsciiCharacterClass<Nothing>(characters);

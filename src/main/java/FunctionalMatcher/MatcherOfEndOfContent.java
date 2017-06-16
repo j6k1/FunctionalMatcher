@@ -30,6 +30,11 @@ public class MatcherOfEndOfContent<T> implements IMatcher<T> {
 		return new MatcherOfEndOfContent<T>(callback);
 	}
 
+	public static <T> MatcherOfEndOfContent<T> of(MatchResultType<T> t)
+	{
+		return new MatcherOfEndOfContent<T>();
+	}
+
 	public static MatcherOfEndOfContent<Nothing> of()
 	{
 		return new MatcherOfEndOfContent<Nothing>();

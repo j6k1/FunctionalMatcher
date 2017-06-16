@@ -17,6 +17,11 @@ public class MatcherOfCharacterRange<T> implements IMatcherOfCharacterClass<T> {
 		init(callback, codeStart, codeEnd);
 	}
 
+	public static <T> MatcherOfCharacterRange<T> of(MatchResultType<T> t, char codeStart, char codeEnd)
+	{
+		return new MatcherOfCharacterRange<T>(codeStart, codeEnd);
+	}
+
 	public MatcherOfCharacterRange(char codeStart, char codeEnd)
 	{
 		init(null, codeStart, codeEnd);

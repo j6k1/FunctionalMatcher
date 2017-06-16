@@ -30,6 +30,11 @@ public class MatcherOfEndOfLine<T> implements IMatcher<T> {
 		return new MatcherOfEndOfLine<T>(callback);
 	}
 
+	public static <T> MatcherOfEndOfLine<T> of(MatchResultType<T> t)
+	{
+		return new MatcherOfEndOfLine<T>();
+	}
+
 	public static MatcherOfEndOfLine<Nothing> of()
 	{
 		return new MatcherOfEndOfLine<Nothing>();
