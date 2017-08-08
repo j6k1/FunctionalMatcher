@@ -2,11 +2,19 @@ package FunctionalMatcher;
 
 import java.util.Optional;
 
-public class MatcherOfFold<T> implements IMatcher<T> {
-	protected IOnListMatch<T> callback;
+public class MatcherOfFold<T,R> implements IMatcher<R> {
+	protected IOnListMatch<T,R> callback;
+	protected IOnMatch<T,R> emptyCallback;
 	protected IListMatcher<T> matcher;
 
-	public MatcherOfFold(IOnListMatch<T> callback, IListMatcher<T> matcher)
+	protected MatcherOfFold(IOnListMatch<T,R> callback, IListMatcher<T> matcher)
+	{
+		this.matcher = matcher;
+		this.callback = callback;
+		this.emptyCallback = (str, start, end, m) -> Optional.empty();
+	}
+
+	public static <T,R> MatcherOfFold<T,R> of(IOnListMatch<T,R> callback, IListMatcher<T> matcher)
 	{
 		if(matcher == null)
 		{
@@ -17,22 +25,11 @@ public class MatcherOfFold<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(callback, matcher);
-	}
-
-	protected void init(IOnListMatch<T> callback, IListMatcher<T> matcher)
-	{
-		this.matcher = matcher;
-		this.callback = callback;
-	}
-
-	public static <T> MatcherOfFold<T> of(IOnListMatch<T> callback, IListMatcher<T> matcher)
-	{
-		return new MatcherOfFold<T>(callback, matcher);
+		return new MatcherOfFold<T,R>(callback, matcher);
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary) {
+	public Optional<MatchResult<R>> match(String str, int start, boolean temporary) {
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -58,7 +55,9 @@ public class MatcherOfFold<T> implements IMatcher<T> {
 			{
 				MatchResultList<T> m = result.get();
 
-				return Optional.of(MatchResult.of(m.range, Optional.of(callback.onmatch(str, m.range.start, m.range.end, m))));
+				return Optional.of(
+						MatchResult.of(
+							m.range, callback.onmatch(str, m.range.start, m.range.end, m)));
 			}
 		}
 	}

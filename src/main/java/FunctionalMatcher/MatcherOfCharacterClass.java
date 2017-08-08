@@ -3,11 +3,20 @@ package FunctionalMatcher;
 import java.util.HashSet;
 import java.util.Optional;
 
-public class MatcherOfCharacterClass<T> implements IMatcherOfCharacterClass<T> {
-	protected IOnMatch<T> callback;
+public class MatcherOfCharacterClass<T,R> implements IMatcherOfCharacterClass<R> {
+	protected IOnMatch<T,R> callback;
+	protected IOnMatch<T,R> emptyCallback;
 	protected final HashSet<Character> charactersSet = new HashSet<>();
 
-	public MatcherOfCharacterClass(IOnMatch<T> callback, String characters)
+	protected MatcherOfCharacterClass(IOnMatch<T,R> callback, String characters)
+	{
+		char[] chars = characters.toCharArray();
+		for(char c: chars) charactersSet.add(c);
+		this.callback = callback;
+		this.emptyCallback = (str, start, end, m) -> Optional.empty();
+	}
+
+	public static <T,R> MatcherOfCharacterClass<T,R> of(IOnMatch<T,R> callback, String characters)
 	{
 		if(characters == null)
 		{
@@ -18,43 +27,32 @@ public class MatcherOfCharacterClass<T> implements IMatcherOfCharacterClass<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(callback, characters);
+		return new MatcherOfCharacterClass<T,R>(callback, characters);
 	}
 
-	public MatcherOfCharacterClass(String characters)
+	public static <T> MatcherOfCharacterClass<T,T> of(MatchResultType<T> t, String characters)
 	{
 		if(characters == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument characters is null.");
 		}
 
-		init(null, characters);
+		return new MatcherOfCharacterClass<T,T>((str, start, end, m) -> Optional.empty(), characters);
 	}
 
-	protected void init(IOnMatch<T> callback, String characters)
+	public static MatcherOfCharacterClass<Nothing,Nothing> of(String characters)
 	{
-		char[] chars = characters.toCharArray();
-		for(char c: chars) charactersSet.add(c);
-		this.callback = callback;
-	}
+		if(characters == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument characters is null.");
+		}
 
-	public static <T> MatcherOfCharacterClass<T> of(IOnMatch<T> callback, String characters)
-	{
-		return new MatcherOfCharacterClass<T>(callback, characters);
-	}
-
-	public static <T> MatcherOfCharacterClass<T> of(MatchResultType<T> t, String characters)
-	{
-		return new MatcherOfCharacterClass<T>(characters);
-	}
-
-	public static <T> MatcherOfCharacterClass<T> of(String characters)
-	{
-		return new MatcherOfCharacterClass<T>(characters);
+		return new MatcherOfCharacterClass<Nothing,Nothing>(
+											(str, start, end, m) -> Optional.empty(), characters);
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary)
+	public Optional<MatchResult<R>> match(String str, int start, boolean temporary)
 	{
 		if(str == null)
 		{
@@ -70,17 +68,21 @@ public class MatcherOfCharacterClass<T> implements IMatcherOfCharacterClass<T> {
 			throw new InvalidMatchStateException("The current position is outside the content range.");
 		}
 		else if(start == str.length() || !charactersSet.contains(str.charAt(start))) return Optional.empty();
-		else if(callback == null || temporary)
+		else if(temporary)
 		{
-			return Optional.of(MatchResult.of(new Range(start, start + 1), Optional.empty()));
+			return Optional.of(
+					MatchResult.of(
+							new Range(start, start + 1),
+								emptyCallback.onmatch(str,
+											start, start + 1, Optional.empty())));
 		}
 		else
 		{
 			return Optional.of(
 					MatchResult.of(
 							new Range(start, start + 1),
-								Optional.of(callback.onmatch(str,
-											start, start + 1, Optional.empty()))));
+								callback.onmatch(str,
+											start, start + 1, Optional.empty())));
 		}
 	}
 }

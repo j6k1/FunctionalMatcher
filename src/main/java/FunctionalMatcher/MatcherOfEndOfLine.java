@@ -2,46 +2,38 @@ package FunctionalMatcher;
 
 import java.util.Optional;
 
-public class MatcherOfEndOfLine<T> implements IMatcher<T> {
-	protected IOnMatch<T> callback;
+public class MatcherOfEndOfLine<T,R> implements IMatcher<R> {
+	protected IOnMatch<T,R> callback;
+	protected IOnMatch<T,R> emptyCallback;
 
-	public MatcherOfEndOfLine(IOnMatch<T> callback)
+	protected MatcherOfEndOfLine(IOnMatch<T,R> callback)
+	{
+		this.callback = callback;
+		this.emptyCallback = (str, start, end, m) -> Optional.empty();
+	}
+
+	public static <T,R> MatcherOfEndOfLine<T,R> of(IOnMatch<T,R> callback)
 	{
 		if(callback == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(callback);
+		return new MatcherOfEndOfLine<T,R>(callback);
 	}
 
-	public MatcherOfEndOfLine()
+	public static <T> MatcherOfEndOfLine<T,T> of(MatchResultType<T> t)
 	{
-		init(null);
+		return new MatcherOfEndOfLine<T,T>((str, start, end, m) -> Optional.empty());
 	}
 
-	protected void init(IOnMatch<T> callback)
+	public static MatcherOfEndOfLine<Nothing,Nothing> of()
 	{
-		this.callback = callback;
-	}
-
-	public static <T> MatcherOfEndOfLine<T> of(IOnMatch<T> callback)
-	{
-		return new MatcherOfEndOfLine<T>(callback);
-	}
-
-	public static <T> MatcherOfEndOfLine<T> of(MatchResultType<T> t)
-	{
-		return new MatcherOfEndOfLine<T>();
-	}
-
-	public static MatcherOfEndOfLine<Nothing> of()
-	{
-		return new MatcherOfEndOfLine<Nothing>();
+		return new MatcherOfEndOfLine<Nothing,Nothing>((str, start, end, m) -> Optional.empty());
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary) {
+	public Optional<MatchResult<R>> match(String str, int start, boolean temporary) {
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -62,17 +54,19 @@ public class MatcherOfEndOfLine<T> implements IMatcher<T> {
 		{
 			return Optional.empty();
 		}
-		else if(callback == null || temporary)
+		else if(temporary)
 		{
-			return Optional.of(MatchResult.of(new Range(start, start), Optional.empty()));
+			return Optional.of(
+					MatchResult.of(
+							new Range(start, start),
+								emptyCallback.onmatch(str, start, start, Optional.empty())));
 		}
 		else
 		{
 			return Optional.of(
 					MatchResult.of(
 							new Range(start, start),
-								Optional.of(
-									callback.onmatch(str, start, start, Optional.empty()))));
+								callback.onmatch(str, start, start, Optional.empty())));
 		}
 	}
 }

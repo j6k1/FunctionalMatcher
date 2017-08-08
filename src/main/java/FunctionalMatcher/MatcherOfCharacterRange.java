@@ -2,54 +2,46 @@ package FunctionalMatcher;
 
 import java.util.Optional;
 
-public class MatcherOfCharacterRange<T> implements IMatcherOfCharacterClass<T> {
-	protected IOnMatch<T> callback;
+public class MatcherOfCharacterRange<T,R> implements IMatcherOfCharacterClass<R> {
+	protected IOnMatch<T,R> callback;
+	protected IOnMatch<T,R> emptyCallback;
 	protected char codeStart;
 	protected char codeEnd;
 
-	public MatcherOfCharacterRange(IOnMatch<T> callback, char codeStart, char codeEnd)
+	protected MatcherOfCharacterRange(IOnMatch<T,R> callback, char codeStart, char codeEnd)
 	{
-		if(callback == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
-		}
-
-		init(callback, codeStart, codeEnd);
+		this.codeStart = codeStart;
+		this.codeEnd = codeEnd;
+		this.callback = callback;
+		this.emptyCallback = (str, start, end, m) -> Optional.empty();
 	}
 
-	public static <T> MatcherOfCharacterRange<T> of(MatchResultType<T> t, char codeStart, char codeEnd)
-	{
-		return new MatcherOfCharacterRange<T>(codeStart, codeEnd);
-	}
-
-	public MatcherOfCharacterRange(char codeStart, char codeEnd)
-	{
-		init(null, codeStart, codeEnd);
-	}
-
-	protected void init(IOnMatch<T> callback, char codeStart, char codeEnd)
+	public static <T,R> MatcherOfCharacterRange<T,R> of(IOnMatch<T,R> callback, char codeStart, char codeEnd)
 	{
 		if(codeStart > codeEnd)
 		{
 			throw new InvalidCharacterRangeException("A value greater than end was specified as the value of start.");
 		}
-		this.codeStart = codeStart;
-		this.codeEnd = codeEnd;
-		this.callback = callback;
+		else if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
+		return new MatcherOfCharacterRange<T,R>(callback, codeStart, codeEnd);
 	}
 
-	public static <T> MatcherOfCharacterRange<T> of(IOnMatch<T> callback, char codeStart, char codeEnd)
+	public static <T> MatcherOfCharacterRange<T,T> of(MatchResultType<T> t, char codeStart, char codeEnd)
 	{
-		return new MatcherOfCharacterRange<T>(callback, codeStart, codeEnd);
+		return new MatcherOfCharacterRange<T,T>((str, start, end, m) -> Optional.empty(), codeStart, codeEnd);
 	}
 
-	public static MatcherOfCharacterRange<Nothing> of(char codeStart, char codeEnd)
+	public static MatcherOfCharacterRange<Nothing,Nothing> of(char codeStart, char codeEnd)
 	{
-		return new MatcherOfCharacterRange<Nothing>(codeStart, codeEnd);
+		return new MatcherOfCharacterRange<Nothing,Nothing>((str, start, end, m) -> Optional.empty(), codeStart, codeEnd);
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary)
+	public Optional<MatchResult<R>> match(String str, int start, boolean temporary)
 	{
 		if(str == null)
 		{
@@ -70,18 +62,21 @@ public class MatcherOfCharacterRange<T> implements IMatcherOfCharacterClass<T> {
 			throw new InvalidMatchStateException("The current position is outside the content range.");
 		}
 		else if(start == l || (c = str.charAt(start)) < codeStart || c > codeEnd) return Optional.empty();
-		else if(callback == null || temporary)
+		else if(temporary)
 		{
-			return Optional.of(MatchResult.of(new Range(start, start + 1), Optional.empty()));
+			return Optional.of(
+					MatchResult.of(
+							new Range(start, start + 1),
+								emptyCallback.onmatch(str,
+									start, start + 1, Optional.empty())));
 		}
 		else
 		{
 			return Optional.of(
 					MatchResult.of(
 							new Range(start, start + 1),
-								Optional.of(
-									callback.onmatch(str,
-										start, start + 1, Optional.empty()))));
+								callback.onmatch(str,
+									start, start + 1, Optional.empty())));
 		}
 	}
 

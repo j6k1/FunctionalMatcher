@@ -13,6 +13,11 @@ public class Termination<T> implements ITermination<T> {
 		return new Termination<T>(result);
 	}
 
+	public static <T> Termination<T> of(MatchResultType<T> t, MatchResult<T> result)
+	{
+		return new Termination<T>(result);
+	}
+
 	@Override
 	public MatchResult<T> result() {
 		return result;

@@ -3,8 +3,9 @@ package FunctionalMatcher;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class MatcherOfAsciiCharacterClass<T> implements IMatcherOfCharacterClass<T> {
-	protected IOnMatch<T> callback;
+public class MatcherOfAsciiCharacterClass<T,R> implements IMatcherOfCharacterClass<R> {
+	protected IOnMatch<T,R> callback;
+	protected IOnMatch<T,R> emptyCallback;
 	protected final boolean[] characterMap;
 
 	{
@@ -12,32 +13,13 @@ public class MatcherOfAsciiCharacterClass<T> implements IMatcherOfCharacterClass
 		Arrays.fill(characterMap, false);
 	}
 
-	public MatcherOfAsciiCharacterClass(IOnMatch<T> callback, String characters)
-	{
-		if(characters == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument characters is null.");
-		}
-		else if(callback == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
-		}
-
-		init(callback, characters);
-	}
-
-	protected MatcherOfAsciiCharacterClass(String characters)
+	protected MatcherOfAsciiCharacterClass(IOnMatch<T,R> callback, String characters)
 	{
 		if(characters == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument characters is null.");
 		}
 
-		init(null, characters);
-	}
-
-	protected void init(IOnMatch<T> callback, String characters)
-	{
 		char[] chars = characters.toCharArray();
 
 		for(char c: chars)
@@ -49,26 +31,29 @@ public class MatcherOfAsciiCharacterClass<T> implements IMatcherOfCharacterClass
 			}
 			characterMap[c] = true;
 		}
+
 		this.callback = callback;
+		this.emptyCallback = (str, start, end, m) -> Optional.empty();
 	}
 
-	public static <T> MatcherOfAsciiCharacterClass<T> of(IOnMatch<T> callback, String characters)
+	public static <T,R> MatcherOfAsciiCharacterClass<T,R> of(IOnMatch<T,R> callback, String characters)
 	{
-		return new MatcherOfAsciiCharacterClass<T>(callback, characters);
+		return new MatcherOfAsciiCharacterClass<T,R>(callback, characters);
 	}
 
-	public static <T> MatcherOfAsciiCharacterClass<T> of(MatchResultType<T> t, String characters)
+	public static <T> MatcherOfAsciiCharacterClass<T,T> of(MatchResultType<T> t, String characters)
 	{
-		return new MatcherOfAsciiCharacterClass<T>(characters);
+		return new MatcherOfAsciiCharacterClass<T,T>((str, start, end, m) -> Optional.empty(), characters);
 	}
 
-	public static MatcherOfAsciiCharacterClass<Nothing> of(String characters)
+	public static MatcherOfAsciiCharacterClass<Nothing,Nothing> of(String characters)
 	{
-		return new MatcherOfAsciiCharacterClass<Nothing>(characters);
+		return new MatcherOfAsciiCharacterClass<Nothing,Nothing>(
+												(str, start, end, m) -> Optional.empty(), characters);
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary)
+	public Optional<MatchResult<R>> match(String str, int start, boolean temporary)
 	{
 		if(str == null)
 		{
@@ -87,17 +72,21 @@ public class MatcherOfAsciiCharacterClass<T> implements IMatcherOfCharacterClass
 			throw new InvalidMatchStateException("The current position is outside the content range.");
 		}
 		else if(start == l || (c = str.charAt(start)) >= 0x80 || !characterMap[c]) return Optional.empty();
-		else if(callback == null || temporary)
+		else if(temporary)
 		{
-			return Optional.of(MatchResult.of(new Range(start, start + 1), Optional.empty()));
+			return Optional.of(
+					MatchResult.of(
+							new Range(start, start + 1),
+								emptyCallback.onmatch(str,
+											start, start + 1, Optional.empty())));
 		}
 		else
 		{
 			return Optional.of(
 					MatchResult.of(
 							new Range(start, start + 1),
-								Optional.of(callback.onmatch(str,
-											start, start + 1, Optional.empty()))));
+								callback.onmatch(str,
+											start, start + 1, Optional.empty())));
 		}
 	}
 }

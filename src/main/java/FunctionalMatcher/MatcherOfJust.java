@@ -2,11 +2,19 @@ package FunctionalMatcher;
 
 import java.util.Optional;
 
-public class MatcherOfJust<T> implements IMatcher<T> {
-	protected IOnMatch<T> callback;
+public class MatcherOfJust<T,R> implements IMatcher<R> {
+	protected IOnMatch<T,R> callback;
+	protected IOnMatch<T,R> emptyCallback;
 	protected String value;
 
-	public MatcherOfJust(IOnMatch<T> callback, String value)
+	protected MatcherOfJust(IOnMatch<T,R> callback, String value)
+	{
+		this.value = value;
+		this.callback = callback;
+		this.emptyCallback = (str, start, end, m) -> Optional.empty();
+	}
+
+	public static <T,R> MatcherOfJust<T,R> of(IOnMatch<T,R> callback, String value)
 	{
 		if(value == null)
 		{
@@ -17,42 +25,31 @@ public class MatcherOfJust<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(callback, value);
+		return new MatcherOfJust<T,R>(callback, value);
 	}
 
-	public MatcherOfJust(String value)
+	public static <T> MatcherOfJust<T,T> of(MatchResultType<T> t, String value)
 	{
 		if(value == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument value is null.");
 		}
 
-		init(null, value);
+		return new MatcherOfJust<T,T>((str, start, end, m) -> Optional.empty(), value);
 	}
 
-	protected void init(IOnMatch<T> callback, String value)
+	public static MatcherOfJust<Nothing,Nothing> of(String value)
 	{
-		this.value = value;
-		this.callback = callback;
-	}
+		if(value == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument value is null.");
+		}
 
-	public static <T> MatcherOfJust<T> of(IOnMatch<T> callback, String value)
-	{
-		return new MatcherOfJust<T>(callback, value);
-	}
-
-	public static <T> MatcherOfJust<T> of(MatchResultType<T> t, String value)
-	{
-		return new MatcherOfJust<T>(value);
-	}
-
-	public static MatcherOfJust<Nothing> of(String value)
-	{
-		return new MatcherOfJust<Nothing>(value);
+		return new MatcherOfJust<Nothing,Nothing>((str, start, end, m) -> Optional.empty(), value);
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary)
+	public Optional<MatchResult<R>> match(String str, int start, boolean temporary)
 	{
 		if(str == null)
 		{
@@ -70,19 +67,23 @@ public class MatcherOfJust<T> implements IMatcher<T> {
 			throw new InvalidMatchStateException("The current position is outside the content range.");
 		}
 		else if(start == l || !str.startsWith(value, start)) return Optional.empty();
-		else if(callback == null || temporary)
+		else if(temporary)
 		{
-			return Optional.of(MatchResult.of(new Range(start, start + value.length()), Optional.empty()));
+			return Optional.of(
+					MatchResult.of(
+							new Range(start, start + value.length()),
+								emptyCallback.onmatch(
+											str,
+											start, start + value.length(), Optional.empty())));
 		}
 		else
 		{
 			return Optional.of(
 					MatchResult.of(
 							new Range(start, start + value.length()),
-								Optional.of(
-									callback.onmatch(
+								callback.onmatch(
 											str,
-											start, start + value.length(), Optional.empty()))));
+											start, start + value.length(), Optional.empty())));
 		}
 	}
 }

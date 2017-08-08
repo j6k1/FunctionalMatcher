@@ -3,11 +3,19 @@ package FunctionalMatcher;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class MatcherOfSelect<T> implements IMatcher<T> {
-	protected IOnMatch<T> callback;
+public class MatcherOfSelect<T,R> implements IMatcher<R> {
+	protected IOnMatch<T,R> callback;
+	protected IOnMatch<T,R> emptyCallback;
 	protected ArrayList<IMatcher<T>> matcherList;
 
-	public MatcherOfSelect(IOnMatch<T> callback, ArrayList<IMatcher<T>> matcherList)
+	protected MatcherOfSelect(IOnMatch<T,R> callback, ArrayList<IMatcher<T>> matcherList)
+	{
+		this.matcherList = matcherList;
+		this.callback = callback;
+		this.emptyCallback = (str, start, end, m) -> Optional.empty();
+	}
+
+	public static <T,R> MatcherOfSelect<T,R> of(IOnMatch<T,R> callback, ArrayList<IMatcher<T>> matcherList)
 	{
 		if(matcherList == null)
 		{
@@ -18,20 +26,22 @@ public class MatcherOfSelect<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(callback, matcherList);
+		return new MatcherOfSelect<T,R>(callback, matcherList);
 	}
 
-	public MatcherOfSelect(ArrayList<IMatcher<T>> matcherList)
+	public static <T> MatcherOfSelect<T,T> of(ArrayList<IMatcher<T>> matcherList)
 	{
 		if(matcherList == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument matcherList is null.");
 		}
 
-		init(null, matcherList);
+		return new MatcherOfSelect<T,T>((str, start, end, m) -> {
+			return m.flatMap(r -> r.value);
+		}, matcherList);
 	}
 
-	public MatcherOfSelect(IOnMatch<T> callback, IMatcher<T> matcher)
+	public static <T,R> MatcherOfSelect<T,R> of(IOnMatch<T,R> callback, IMatcher<T> matcher)
 	{
 		if(matcher == null)
 		{
@@ -44,20 +54,21 @@ public class MatcherOfSelect<T> implements IMatcher<T> {
 
 		ArrayList<IMatcher<T>> lst = new ArrayList<IMatcher<T>>();
 		lst.add(matcher);
-		init(callback, lst);
+
+		return new MatcherOfSelect<T,R>(callback, lst);
 	}
 
-	public MatcherOfSelect(IOnMatch<T> callback)
+	public static <T,R> MatcherOfSelect<T,R> of(IOnMatch<T,R> callback)
 	{
 		if(callback == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(callback, new ArrayList<IMatcher<T>>());
+		return new MatcherOfSelect<T,R>(callback, new ArrayList<IMatcher<T>>());
 	}
 
-	public MatcherOfSelect(IMatcher<T> matcher)
+	public static <T> MatcherOfSelect<T,T> of(IMatcher<T> matcher)
 	{
 		if(matcher == null)
 		{
@@ -66,41 +77,13 @@ public class MatcherOfSelect<T> implements IMatcher<T> {
 
 		ArrayList<IMatcher<T>> lst = new ArrayList<IMatcher<T>>();
 		lst.add(matcher);
-		init(null, lst);
+
+		return new MatcherOfSelect<T,T>((str, start, end, m) -> {
+			return m.flatMap(r -> r.value);
+		}, lst);
 	}
 
-	protected void init(IOnMatch<T> callback, ArrayList<IMatcher<T>> matcherList)
-	{
-		this.matcherList = matcherList;
-		this.callback = callback;
-	}
-
-	public static <T> MatcherOfSelect<T> of(IOnMatch<T> callback, ArrayList<IMatcher<T>> matcherList)
-	{
-		return new MatcherOfSelect<T>(callback, matcherList);
-	}
-
-	public static <T> MatcherOfSelect<T> of(ArrayList<IMatcher<T>> matcherList)
-	{
-		return new MatcherOfSelect<T>(matcherList);
-	}
-
-	public static <T> MatcherOfSelect<T> of(IOnMatch<T> callback, IMatcher<T> matcher)
-	{
-		return new MatcherOfSelect<T>(callback, matcher);
-	}
-
-	public static <T> MatcherOfSelect<T> of(IOnMatch<T> callback)
-	{
-		return new MatcherOfSelect<T>(callback);
-	}
-
-	public static <T> MatcherOfSelect<T> of(IMatcher<T> matcher)
-	{
-		return new MatcherOfSelect<T>(matcher);
-	}
-
-	public MatcherOfSelect<T> add(IMatcher<T> matcher)
+	public MatcherOfSelect<T,R> add(IMatcher<T> matcher)
 	{
 		if(matcher == null)
 		{
@@ -108,11 +91,12 @@ public class MatcherOfSelect<T> implements IMatcher<T> {
 		}
 
 		matcherList.add(matcher);
+
 		return this;
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary)
+	public Optional<MatchResult<R>> match(String str, int start, boolean temporary)
 	{
 		if(str == null)
 		{
@@ -140,26 +124,21 @@ public class MatcherOfSelect<T> implements IMatcher<T> {
 				{
 					MatchResult<T> m = result.get();
 
-					if(callback == null || temporary)
+					if(temporary)
 					{
-						if(m.value.isPresent())
-						{
-							return Optional.of(MatchResult.of(new Range(start, m.range.end), m.value));
-						}
-						else
-						{
-							return Optional.of(MatchResult.of(new Range(start, m.range.end), Optional.empty()));
-						}
+						return Optional.of(
+								MatchResult.of(
+										new Range(start, m.range.end),
+											emptyCallback.onmatch(
+													str, start, m.range.end, Optional.of(m))));
 					}
 					else
 					{
 						return Optional.of(
 								MatchResult.of(
 										new Range(start, m.range.end),
-											Optional.of(
-												callback.onmatch(
-													str, start, m.range.end, Optional.of(m)))));
-
+											callback.onmatch(
+													str, start, m.range.end, Optional.of(m))));
 					}
 				}
 			}

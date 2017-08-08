@@ -3,19 +3,41 @@ package FunctionalMatcher;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T> {
+public class MatcherOfShortestInRange<T,R> implements IMatcher<R>, IListMatcher<R> {
 	protected int startTimes;
 	protected int endTimes;
-	protected IOnMatch<T> callback;
+	protected IOnMatch<T,R> callback;
+	protected IOnMatch<T,R> emptyCallback;
 	protected IMatcher<T> matcher;
 	protected IMatcher<T> anchor;
 
-	public MatcherOfShortestInRange(IOnMatch<T> callback,
+	protected MatcherOfShortestInRange(IOnMatch<T,R> callback,
 										IMatcher<T> matcher,
 										IMatcher<T> anchor,
 										int startTimes, int endTimes)
 	{
-		if(matcher == null)
+		this.matcher = matcher;
+		this.anchor = anchor;
+		this.startTimes = startTimes;
+		this.endTimes = endTimes;
+		this.callback = callback;
+		this.emptyCallback = (str, start, end, m) -> Optional.empty();
+	}
+
+	public static <T,R> MatcherOfShortestInRange<T,R> of(IOnMatch<T,R> callback,
+												IMatcher<T> matcher,
+												IMatcher<T> anchor,
+												int startTimes, int endTimes)
+	{
+		if(startTimes < 0)
+		{
+			throw new InvalidMatchConditionException("A negative value was specified for the number of matches.");
+		}
+		else if(startTimes > endTimes)
+		{
+			throw new InvalidRangeException("A value greater than end was specified as the value of start.");
+		}
+		else if(matcher == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
 		}
@@ -28,27 +50,11 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(callback, matcher, anchor, startTimes, endTimes);
+		return new MatcherOfShortestInRange<T,R>(callback, matcher, anchor, startTimes, endTimes);
 	}
 
-	public MatcherOfShortestInRange(IMatcher<T> matcher, IMatcher<T> anchor,
-										int startTimes, int endTimes)
-	{
-		if(matcher == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
-		}
-		else if(anchor == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument anchor is null.");
-		}
-
-		init(null, matcher, anchor, startTimes, endTimes);
-	}
-
-	protected void init(IOnMatch<T> callback,
-						IMatcher<T> matcher, IMatcher<T> anchor,
-										int startTimes, int endTimes)
+	public static <T> MatcherOfShortestInRange<T,T> of(IMatcher<T> matcher, IMatcher<T> anchor,
+												int startTimes, int endTimes)
 	{
 		if(startTimes < 0)
 		{
@@ -58,29 +64,22 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 		{
 			throw new InvalidRangeException("A value greater than end was specified as the value of start.");
 		}
-		this.matcher = matcher;
-		this.anchor = anchor;
-		this.startTimes = startTimes;
-		this.endTimes = endTimes;
-		this.callback = callback;
-	}
+		else if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+		else if(anchor == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument anchor is null.");
+		}
 
-	public static <T> MatcherOfShortestInRange<T> of(IOnMatch<T> callback,
-												IMatcher<T> matcher,
-												IMatcher<T> anchor,
-												int startTimes, int endTimes)
-	{
-		return new MatcherOfShortestInRange<T>(callback, matcher, anchor, startTimes, endTimes);
-	}
-
-	public static <T> MatcherOfShortestInRange<T> of(IMatcher<T> matcher, IMatcher<T> anchor,
-												int startTimes, int endTimes)
-	{
-		return new MatcherOfShortestInRange<T>(matcher, anchor, startTimes, endTimes);
+		return new MatcherOfShortestInRange<T,T>((str, start, end, m) -> {
+			return m.flatMap(r -> r.value);
+		}, matcher, anchor, startTimes, endTimes);
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary) {
+	public Optional<MatchResult<R>> match(String str, int start, boolean temporary) {
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -108,26 +107,25 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 			{
 				if(i + 1 >= startTimes)
 				{
-					if(callback == null || temporary)
+					if(temporary)
 					{
-						return Optional.of(MatchResult.of(new Range(start, m.range.end), Optional.empty()));
+						return Optional.of(
+								MatchResult.of(
+										new Range(start, current),
+											emptyCallback.onmatch(
+													str, start, m.range.end, Optional.empty())));
 					}
 					else
 					{
 						return Optional.of(
 								MatchResult.of(
 										new Range(start, current),
-											Optional.of(
-												callback.onmatch(
-													str, start, m.range.end, Optional.empty()))));
+											callback.onmatch(
+													str, start, m.range.end, Optional.empty())));
 					}
 				}
 				if(current == m.range.end) break;
 				current = m.range.end;
-			}
-			else if(!result.isPresent() && i < startTimes)
-			{
-				return Optional.empty();
 			}
 			else if(!result.isPresent())
 			{
@@ -147,7 +145,7 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 	}
 
 	@Override
-	public Optional<MatchResultList<T>> matchl(String str, int start, boolean temporary) {
+	public Optional<MatchResultList<R>> matchl(String str, int start, boolean temporary) {
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -156,7 +154,7 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 		int current = start;
 		int lastEnd = -1;
 		int l = str.length();
-		ArrayList<MatchResult<T>> resultList = new ArrayList<>();
+		ArrayList<MatchResult<R>> resultList = new ArrayList<>();
 
 		if(start < 0)
 		{
@@ -175,15 +173,15 @@ public class MatcherOfShortestInRange<T> implements IMatcher<T>, IListMatcher<T>
 			{
 				MatchResult<T> m = result.get();
 
-				if(callback != null && !temporary)
+				if(temporary)
 				{
 					resultList.add(MatchResult.of(
-									m.range, Optional.of(
-										callback.onmatch(str, start, m.range.end, Optional.of(m)))));
+									m.range, emptyCallback.onmatch(str, start, m.range.end, Optional.of(m))));
 				}
 				else
 				{
-					resultList.add(m);
+					resultList.add(MatchResult.of(
+							m.range, callback.onmatch(str, start, m.range.end, Optional.of(m))));
 				}
 
 				if(anchor.match(str, (m = result.get()).range.end, true).isPresent())

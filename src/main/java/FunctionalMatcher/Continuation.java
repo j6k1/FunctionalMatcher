@@ -13,6 +13,11 @@ public class Continuation<T> implements IContinuation<T> {
 		return new Continuation<T>(result);
 	}
 
+	public static <T> Continuation<T> of(MatchResultType<T> t, MatchResult<T> result)
+	{
+		return new Continuation<T>(result);
+	}
+
 	@Override
 	public MatchResult<T> result() {
 		return result;

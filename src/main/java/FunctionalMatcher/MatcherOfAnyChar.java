@@ -2,53 +2,41 @@ package FunctionalMatcher;
 
 import java.util.Optional;
 
-public class MatcherOfAnyChar<T> implements IMatcher<T> {
-	protected IOnMatch<T> callback;
+public class MatcherOfAnyChar<T,R> implements IMatcher<R> {
+	protected IOnMatch<T,R> callback;
+	protected IOnMatch<T,R> emptyCallback;
 	protected boolean multiline;
 
-	public MatcherOfAnyChar(IOnMatch<T> callback, boolean multiline)
-	{
-		if(callback == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
-		}
-
-		init(callback, multiline);
-	}
-
-	public MatcherOfAnyChar(boolean multiline)
-	{
-		init(null, multiline);
-	}
-
-	protected void init(IOnMatch<T> callback, boolean multiline)
+	protected MatcherOfAnyChar(IOnMatch<T,R> callback, boolean multiline)
 	{
 		this.multiline = multiline;
 		this.callback = callback;
+		this.emptyCallback = (str, start, end, m) -> Optional.empty();
 	}
 
-	public static <T> MatcherOfAnyChar<T> of(IOnMatch<T> callback, boolean multiline)
+	public static <T,R> MatcherOfAnyChar<T,R> of(IOnMatch<T,R> callback, boolean multiline)
 	{
 		if(callback == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		return new MatcherOfAnyChar<T>(callback, multiline);
+		return new MatcherOfAnyChar<T,R>(callback, multiline);
 	}
 
-	public static <T> MatcherOfAnyChar<T> of(MatchResultType<T> t, boolean multiline)
+	public static <T,R> MatcherOfAnyChar<T,T> of(MatchResultType<T> t, boolean multiline)
 	{
-		return new MatcherOfAnyChar<T>(multiline);
+		return new MatcherOfAnyChar<T,T>((str, start, end, m) -> Optional.empty(), multiline);
 	}
 
-	public static MatcherOfAnyChar<Nothing> of(boolean multiline)
+	public static MatcherOfAnyChar<Nothing,Nothing> of(boolean multiline)
 	{
-		return new MatcherOfAnyChar<Nothing>(multiline);
+		return new MatcherOfAnyChar<Nothing,Nothing>(
+									(str, start, end, m) -> Optional.empty() , multiline);
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary) {
+	public Optional<MatchResult<R>> match(String str, int start, boolean temporary) {
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -64,32 +52,35 @@ public class MatcherOfAnyChar<T> implements IMatcher<T> {
 		{
 			throw new InvalidMatchStateException("The current position is outside the content range.");
 		}
-		else if(multiline && l > start && callback == null || temporary)
+		else if(multiline && l > start && temporary)
 		{
-			return Optional.of(MatchResult.of(new Range(start, start + 1), Optional.empty()));
+			return Optional.of(
+					MatchResult.of(
+							new Range(start, start + 1),
+								emptyCallback.onmatch(str, start, start + 1, Optional.empty())));
 		}
 		else if(multiline && l > start)
 		{
 			return Optional.of(
 					MatchResult.of(
 							new Range(start, start + 1),
-								Optional.of(
-									callback.onmatch(str, start, start + 1, Optional.empty()))));
+								callback.onmatch(str, start, start + 1, Optional.empty())));
 		}
 		else if(!multiline && l > start && str.charAt(start) != '\n' && str.charAt(start) != '\r')
 		{
-			if(callback == null || temporary)
+			if(temporary)
 			{
-				return Optional.of(MatchResult.of(new Range(start, start + 1), Optional.empty()));
+				return Optional.of(
+						MatchResult.of(
+							new Range(start, start + 1),
+								emptyCallback.onmatch(str, start, start + 1, Optional.empty())));
 			}
 			else
 			{
 				return Optional.of(
-						MatchResult.of(
+							MatchResult.of(
 								new Range(start, start + 1),
-									Optional.of(
-										callback.onmatch(
-												str, start, start + 1, Optional.empty()))));
+									callback.onmatch(str, start, start + 1, Optional.empty())));
 			}
 		}
 		else

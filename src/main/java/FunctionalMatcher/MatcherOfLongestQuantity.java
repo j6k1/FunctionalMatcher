@@ -3,16 +3,21 @@ package FunctionalMatcher;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListMatcher<T> {
+public abstract class MatcherOfLongestQuantity<T,R> implements IMatcher<R>, IListMatcher<R> {
 	protected int startTimes;
-	protected IOnMatch<T> callback;
+	protected IOnMatch<T,R> callback;
+	protected IOnMatch<T,R> emptyCallback;
 	protected IMatcher<T> matcher;
 	protected IMatcher<T> anchor;
 
-	public MatcherOfLongestQuantity(IOnMatch<T> callback,
+	protected MatcherOfLongestQuantity(IOnMatch<T,R> callback,
 										IMatcher<T> matcher, IMatcher<T> anchor, int startTimes)
 	{
-		if(matcher == null)
+		if(startTimes < 0)
+		{
+			throw new InvalidMatchConditionException("A negative value was specified for the number of matches.");
+		}
+		else if(matcher == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
 		}
@@ -25,38 +30,15 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(callback, matcher, anchor, startTimes);
-	}
-
-	public MatcherOfLongestQuantity(IMatcher<T> matcher, IMatcher<T> anchor, int startTimes)
-	{
-		if(matcher == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
-		}
-		else if(anchor == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument anchor is null.");
-		}
-
-		init(null, matcher, anchor, startTimes);
-	}
-
-	protected void init(IOnMatch<T> callback,
-										IMatcher<T> matcher, IMatcher<T> anchor, int startTimes)
-	{
-		if(startTimes < 0)
-		{
-			throw new InvalidMatchConditionException("A negative value was specified for the number of matches.");
-		}
 		this.matcher = matcher;
 		this.anchor = anchor;
 		this.startTimes = startTimes;
 		this.callback = callback;
+		this.emptyCallback = (str, start, end, m) -> Optional.empty();
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary) {
+	public Optional<MatchResult<R>> match(String str, int start, boolean temporary) {
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -108,23 +90,26 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 		{
 			return Optional.empty();
 		}
-		else if(callback == null || temporary)
+		else if(temporary)
 		{
-			return Optional.of(MatchResult.of(new Range(start, lastEnd), Optional.empty()));
+			return Optional.of(
+					MatchResult.of(
+							new Range(start, lastEnd),
+								emptyCallback.onmatch(
+												str, start, lastEnd, Optional.empty())));
 		}
 		else
 		{
 			return Optional.of(
 					MatchResult.of(
 							new Range(start, lastEnd),
-								Optional.of(
-										callback.onmatch(
-												str, start, lastEnd, Optional.empty()))));
+								callback.onmatch(
+												str, start, lastEnd, Optional.empty())));
 		}
 	}
 
 	@Override
-	public Optional<MatchResultList<T>> matchl(String str, int start, boolean temporary) {
+	public Optional<MatchResultList<R>> matchl(String str, int start, boolean temporary) {
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -134,7 +119,7 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 		int lastEnd = -1;
 		int l = str.length();
 		ArrayList<MatchResult<T>> tempResultList = new ArrayList<>();
-		ArrayList<MatchResult<T>> resultList = new ArrayList<>();
+		ArrayList<MatchResult<R>> resultList = new ArrayList<>();
 
 		if(start < 0)
 		{
@@ -159,21 +144,22 @@ public abstract class MatcherOfLongestQuantity<T> implements IMatcher<T>, IListM
 				{
 					lastEnd = m.range.end;
 
-					if(callback != null && !temporary)
+					if(temporary)
 					{
 						for(MatchResult<T> t: tempResultList)
 						{
 							resultList.add(MatchResult.of(
-											m.range, Optional.of(
-												callback.onmatch(
-														str, start, m.range.end, Optional.of(t)))));
+											m.range, emptyCallback.onmatch(
+														str, start, m.range.end, Optional.of(t))));
 						}
 					}
 					else
 					{
 						for(MatchResult<T> t: tempResultList)
 						{
-							resultList.add(t);
+							resultList.add(MatchResult.of(
+									m.range, callback.onmatch(
+												str, start, m.range.end, Optional.of(t))));
 						}
 					}
 					tempResultList = new ArrayList<>();

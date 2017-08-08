@@ -2,11 +2,19 @@ package FunctionalMatcher;
 
 import java.util.Optional;
 
-public class MatcherOfOneOrZero<T> implements IMatcher<T> {
-	protected IOnMatch<T> callback;
+public class MatcherOfOneOrZero<T,R> implements IMatcher<R> {
+	protected IOnMatch<T,R> callback;
+	protected IOnMatch<T,R> emptyCallback;
 	protected IMatcher<T> matcher;
 
-	public MatcherOfOneOrZero(IOnMatch<T> callback, IMatcher<T> matcher)
+	protected MatcherOfOneOrZero(IOnMatch<T,R> callback, IMatcher<T> matcher)
+	{
+		this.matcher = matcher;
+		this.callback = callback;
+		this.emptyCallback = (str, start, end, m) -> Optional.empty();
+	}
+
+	public static <T,R> MatcherOfOneOrZero<T,R> of(IOnMatch<T,R> callback, IMatcher<T> matcher)
 	{
 		if(matcher == null)
 		{
@@ -17,42 +25,23 @@ public class MatcherOfOneOrZero<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(callback, matcher);
+		return new MatcherOfOneOrZero<T,R>(callback, matcher);
 	}
 
-	public MatcherOfOneOrZero(IMatcher<T> matcher)
+	public static <T> MatcherOfOneOrZero<T,T> of(IMatcher<T> matcher)
 	{
 		if(matcher == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
 		}
 
-		init(null, matcher);
-	}
-
-	protected void init(IOnMatch<T> callback, IMatcher<T> matcher)
-	{
-		this.matcher = matcher;
-		this.callback = callback;
-	}
-
-	public static <T> MatcherOfOneOrZero<T> of(IOnMatch<T> callback, IMatcher<T> matcher)
-	{
-		return new MatcherOfOneOrZero<T>(callback, matcher);
-	}
-
-	public static <T> MatcherOfOneOrZero<T> of(IMatcher<T> matcher)
-	{
-		if(matcher == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
-		}
-
-		return new MatcherOfOneOrZero<T>(matcher);
+		return new MatcherOfOneOrZero<T,T>((str, start, end, m) -> {
+			return m.flatMap(r -> r.value);
+		}, matcher);
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary)
+	public Optional<MatchResult<R>> match(String str, int start, boolean temporary)
 	{
 		if(str == null)
 		{
@@ -72,33 +61,38 @@ public class MatcherOfOneOrZero<T> implements IMatcher<T> {
 
 		if(!result.isPresent())
 		{
-			if(callback == null || temporary)
+			if(temporary)
 			{
-				return Optional.of(MatchResult.of(new Range(start, start), Optional.empty()));
+				return Optional.of(
+						MatchResult.of(
+								new Range(start, start),
+									emptyCallback.onmatch(str, start, start, Optional.empty())));
 			}
 			else
 			{
 				return Optional.of(
 						MatchResult.of(
 								new Range(start, start),
-									Optional.of(
-										callback.onmatch(str, start, start, Optional.empty()))));
+									callback.onmatch(str, start, start, Optional.empty())));
 			}
 		}
-		else if(callback == null || temporary)
+		else if(temporary)
 		{
 			return Optional.of(
-					MatchResult.of(new Range(start, result.get().range.end), Optional.empty()));
+					MatchResult.of(
+						new Range(start, result.get().range.end),
+							emptyCallback.onmatch(
+									str,
+									start, start + result.get().range.end, Optional.empty())));
 		}
 		else
 		{
 			return Optional.of(
 					MatchResult.of(
 						new Range(start, result.get().range.end),
-							Optional.of(
-								callback.onmatch(
+							callback.onmatch(
 									str,
-									start, start + result.get().range.end, Optional.empty()))));
+									start, start + result.get().range.end, Optional.empty())));
 		}
 	}
 }

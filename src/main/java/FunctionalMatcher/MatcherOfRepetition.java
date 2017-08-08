@@ -3,12 +3,21 @@ package FunctionalMatcher;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
-	protected IOnMatch<T> callback;
+public class MatcherOfRepetition<T,R> implements IMatcher<R>, IListMatcher<R> {
+	protected IOnMatch<T,R> callback;
+	protected IOnMatch<T,R> emptyCallback;
 	protected IMatcher<T> matcher;
 	protected int times;
 
-	public MatcherOfRepetition(IOnMatch<T> callback, IMatcher<T> matcher, int times)
+	protected MatcherOfRepetition(IOnMatch<T,R> callback, IMatcher<T> matcher, int times)
+	{
+		this.matcher = matcher;
+		this.times = times;
+		this.callback = callback;
+		this.emptyCallback = (str, start, end, m) -> Optional.empty();
+	}
+
+	public static <T,R> MatcherOfRepetition<T,R> of(IOnMatch<T,R> callback, IMatcher<T> matcher, int times)
 	{
 		if(matcher == null)
 		{
@@ -23,43 +32,27 @@ public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
 			throw new InvalidMatchConditionException("A value less than 1 was specified for the number of matches.");
 		}
 
-		init(callback, matcher, times);
+		return new MatcherOfRepetition<T,R>(callback, matcher, times);
 	}
 
-	public MatcherOfRepetition(IMatcher<T> matcher, int times)
+	public static <T> MatcherOfRepetition<T,T> of(IMatcher<T> matcher, int times)
 	{
 		if(matcher == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
 		}
-
-		init(null, matcher, times);
-	}
-
-	protected void init(IOnMatch<T> callback, IMatcher<T> matcher, int times)
-	{
-		this.matcher = matcher;
-		this.times = times;
-		this.callback = callback;
-	}
-
-	public static <T> MatcherOfRepetition<T> of(IOnMatch<T> callback, IMatcher<T> matcher, int times)
-	{
-		return new MatcherOfRepetition<T>(callback, matcher, times);
-	}
-
-	public static <T> MatcherOfRepetition<T> of(IMatcher<T> matcher, int times)
-	{
-		if(matcher == null)
+		else if(times < 1)
 		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+			throw new InvalidMatchConditionException("A value less than 1 was specified for the number of matches.");
 		}
 
-		return new MatcherOfRepetition<T>(matcher, times);
+		return new MatcherOfRepetition<T,T>((str, start, end, m) -> {
+			return m.flatMap(r -> r.value);
+		}, matcher, times);
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary)
+	public Optional<MatchResult<R>> match(String str, int start, boolean temporary)
 	{
 		if(str == null)
 		{
@@ -89,22 +82,24 @@ public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
 			current = m.range.end;
 		}
 
-		if(callback == null || temporary)
+		if(temporary)
 		{
-			return Optional.of(MatchResult.of(new Range(start, current), Optional.empty()));
+			return Optional.of(
+					MatchResult.of(
+							new Range(start, current),
+								emptyCallback.onmatch(str, start, current, Optional.empty())));
 		}
 		else
 		{
 			return Optional.of(
 					MatchResult.of(
 							new Range(start, current),
-								Optional.of(
-									callback.onmatch(str, start, current, Optional.empty()))));
+								callback.onmatch(str, start, current, Optional.empty())));
 		}
 	}
 
 	@Override
-	public Optional<MatchResultList<T>> matchl(String str, int start, boolean temporary)
+	public Optional<MatchResultList<R>> matchl(String str, int start, boolean temporary)
 	{
 		if(str == null)
 		{
@@ -113,7 +108,7 @@ public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
 
 		int current = start;
 		int l = str.length();
-		ArrayList<MatchResult<T>> resultList = new ArrayList<>();
+		ArrayList<MatchResult<R>> resultList = new ArrayList<>();
 
 		if(start < 0)
 		{
@@ -134,15 +129,15 @@ public class MatcherOfRepetition<T> implements IMatcher<T>, IListMatcher<T> {
 
 			current = m.range.end;
 
-			if(callback != null && !temporary)
+			if(temporary)
 			{
 				resultList.add(MatchResult.of(
-								m.range, Optional.of(
-									callback.onmatch(str, start, current, Optional.of(m)))));
+								m.range, emptyCallback.onmatch(str, start, current, Optional.of(m))));
 			}
 			else
 			{
-				resultList.add(m);
+				resultList.add(MatchResult.of(
+						m.range, callback.onmatch(str, start, current, Optional.of(m))));
 			}
 		}
 

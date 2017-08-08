@@ -1,23 +1,20 @@
 package FunctionalMatcher;
 
-public class MatcherOfGreedyOneOrMore<T> extends MatcherOfGreedyQuantity<T> {
-	public MatcherOfGreedyOneOrMore(IOnMatch<T> callback, IContinuationMatcher<T> matcher)
+public class MatcherOfGreedyOneOrMore<T,R> extends MatcherOfGreedyQuantity<T,R> {
+	protected MatcherOfGreedyOneOrMore(IOnMatch<T,R> callback, IContinuationMatcher<T> matcher)
 	{
 		super(callback, matcher, 1);
 	}
 
-	public MatcherOfGreedyOneOrMore(IContinuationMatcher<T> matcher)
+	public static <T,R> MatcherOfGreedyOneOrMore<T,R> of(IOnMatch<T,R> callback, IContinuationMatcher<T> matcher)
 	{
-		super(matcher, 1);
+		return new MatcherOfGreedyOneOrMore<T,R>(callback, matcher);
 	}
 
-	public static <T> MatcherOfGreedyOneOrMore<T> of(IOnMatch<T> callback, IContinuationMatcher<T> matcher)
+	public static <T> MatcherOfGreedyOneOrMore<T,T> of(IContinuationMatcher<T> matcher, int startTimes)
 	{
-		return new MatcherOfGreedyOneOrMore<T>(callback, matcher);
-	}
-
-	public static <T> MatcherOfGreedyOneOrMore<T> of(IContinuationMatcher<T> matcher, int startTimes)
-	{
-		return new MatcherOfGreedyOneOrMore<T>(matcher);
+		return new MatcherOfGreedyOneOrMore<T,T>((str, start, end, m) -> {
+			return m.flatMap(r -> r.value);
+		}, matcher);
 	}
 }

@@ -3,11 +3,24 @@ package FunctionalMatcher;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
-	protected IOnMatch<T> callback;
+public class MatcherOfCharacterClassMultiple<T,R> implements IMatcher<R> {
+	protected IOnMatch<T,R> callback;
+	protected IOnMatch<T,R> emptyCallback;
 	protected final ArrayList<IMatcherOfCharacterClass<T>> matcherList = new ArrayList<>();
 
-	public MatcherOfCharacterClassMultiple(IOnMatch<T> callback, ArrayList<IMatcherOfCharacterClass<T>> matcherList)
+	protected MatcherOfCharacterClassMultiple(IOnMatch<T,R> callback, ArrayList<IMatcherOfCharacterClass<T>> matcherList)
+	{
+		this.matcherList.addAll(matcherList);
+		this.callback = callback;
+		this.emptyCallback = (str, start, end, m) -> Optional.empty();
+	}
+
+	protected MatcherOfCharacterClassMultiple(IOnMatch<T,R> callback)
+	{
+		this(callback, new ArrayList<IMatcherOfCharacterClass<T>>());
+	}
+
+	public static <T,R> MatcherOfCharacterClassMultiple<T,R> of(IOnMatch<T,R> callback, ArrayList<IMatcherOfCharacterClass<T>> matcherList)
 	{
 		if(matcherList == null)
 		{
@@ -18,20 +31,22 @@ public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(callback, matcherList);
+		return new MatcherOfCharacterClassMultiple<T,R>(callback, matcherList);
 	}
 
-	public MatcherOfCharacterClassMultiple(ArrayList<IMatcherOfCharacterClass<T>> matcherList)
+	public static <T> MatcherOfCharacterClassMultiple<T,T> of(ArrayList<IMatcherOfCharacterClass<T>> matcherList)
 	{
 		if(matcherList == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument matcherList is null.");
 		}
 
-		init(null, matcherList);
+		return new MatcherOfCharacterClassMultiple<T,T>((str, start, end, m) -> {
+			return m.flatMap(r -> r.value);
+		}, matcherList);
 	}
 
-	public MatcherOfCharacterClassMultiple(IOnMatch<T> callback, IMatcherOfCharacterClass<T> matcher)
+	public static <T,R> MatcherOfCharacterClassMultiple<T,R> of(IOnMatch<T,R> callback, IMatcherOfCharacterClass<T> matcher)
 	{
 		if(matcher == null)
 		{
@@ -45,20 +60,20 @@ public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 		ArrayList<IMatcherOfCharacterClass<T>> lst = new ArrayList<IMatcherOfCharacterClass<T>>();
 		lst.add(matcher);
 
-		init(callback, lst);
+		return new MatcherOfCharacterClassMultiple<T,R>(callback, lst);
 	}
 
-	public MatcherOfCharacterClassMultiple(IOnMatch<T> callback)
+	public static <T,R> MatcherOfCharacterClassMultiple<T,R> of(IOnMatch<T,R> callback)
 	{
 		if(callback == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(callback, new ArrayList<IMatcherOfCharacterClass<T>>());
+		return new MatcherOfCharacterClassMultiple<T,R>(callback);
 	}
 
-	public MatcherOfCharacterClassMultiple(IMatcherOfCharacterClass<T> matcher)
+	public static <T> MatcherOfCharacterClassMultiple<T,T> of(IMatcherOfCharacterClass<T> matcher)
 	{
 		if(matcher == null)
 		{
@@ -67,41 +82,13 @@ public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 
 		ArrayList<IMatcherOfCharacterClass<T>> lst = new ArrayList<IMatcherOfCharacterClass<T>>();
 		lst.add(matcher);
-		init(null, lst);
+
+		return new MatcherOfCharacterClassMultiple<T,T>((str, start, end, m) -> {
+			return m.flatMap(r -> r.value);
+		}, lst);
 	}
 
-	protected void init(IOnMatch<T> callback, ArrayList<IMatcherOfCharacterClass<T>> matcherList)
-	{
-		this.matcherList.addAll(matcherList);
-		this.callback = callback;
-	}
-
-	public static <T> MatcherOfCharacterClassMultiple<T> of(IOnMatch<T> callback, ArrayList<IMatcherOfCharacterClass<T>> matcherList)
-	{
-		return new MatcherOfCharacterClassMultiple<T>(callback, matcherList);
-	}
-
-	public static <T> MatcherOfCharacterClassMultiple<T> of(ArrayList<IMatcherOfCharacterClass<T>> matcherList)
-	{
-		return new MatcherOfCharacterClassMultiple<T>(matcherList);
-	}
-
-	public static <T> MatcherOfCharacterClassMultiple<T> of(IOnMatch<T> callback, IMatcherOfCharacterClass<T> matcher)
-	{
-		return new MatcherOfCharacterClassMultiple<T>(callback, matcher);
-	}
-
-	public static <T> MatcherOfCharacterClassMultiple<T> of(IOnMatch<T> callback)
-	{
-		return new MatcherOfCharacterClassMultiple<T>(callback);
-	}
-
-	public static <T> MatcherOfCharacterClassMultiple<T> of(IMatcherOfCharacterClass<T> matcher)
-	{
-		return new MatcherOfCharacterClassMultiple<T>(matcher);
-	}
-
-	public MatcherOfCharacterClassMultiple<T> add(IMatcherOfCharacterClass<T> matcher)
+	public MatcherOfCharacterClassMultiple<T,R> add(IMatcherOfCharacterClass<T> matcher)
 	{
 		if(matcher == null)
 		{
@@ -113,7 +100,7 @@ public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary)
+	public Optional<MatchResult<R>> match(String str, int start, boolean temporary)
 	{
 		if(str == null)
 		{
@@ -145,25 +132,21 @@ public class MatcherOfCharacterClassMultiple<T> implements IMatcher<T> {
 				{
 					MatchResult<T> m = result.get();
 
-					if(callback == null || temporary)
+					if(temporary)
 					{
-						if(m.value.isPresent())
-						{
-							return Optional.of(MatchResult.of(new Range(start, m.range.end), m.value));
-						}
-						else
-						{
-							return Optional.of(MatchResult.of(new Range(start, m.range.end), Optional.empty()));
-						}
+						return Optional.of(
+								MatchResult.of(
+										new Range(start, m.range.end),
+											emptyCallback.onmatch(str, start, m.range.end,
+																				Optional.of(m))));
 					}
 					else
 					{
 						return Optional.of(
 								MatchResult.of(
 										new Range(start, m.range.end),
-											Optional.of(
-												callback.onmatch(str, start, m.range.end,
-																				Optional.of(m)))));
+											callback.onmatch(str, start, m.range.end,
+																				Optional.of(m))));
 					}
 				}
 			}

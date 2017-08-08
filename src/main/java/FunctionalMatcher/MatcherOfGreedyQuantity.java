@@ -3,48 +3,35 @@ package FunctionalMatcher;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMatcher<T> {
+public abstract class MatcherOfGreedyQuantity<T,R> implements IMatcher<R>, IListMatcher<R> {
 	protected int startTimes;
-	protected IOnMatch<T> callback;
+	protected IOnMatch<T,R> callback;
+	protected IOnMatch<T,R> emptyCallback;
 	protected IContinuationMatcher<T> matcher;
 
-	public MatcherOfGreedyQuantity(IOnMatch<T> callback, IContinuationMatcher<T> matcher, int startTimes)
+	protected MatcherOfGreedyQuantity(IOnMatch<T,R> callback, IContinuationMatcher<T> matcher, int startTimes)
 	{
 		if(matcher == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+		else if(startTimes < 0)
+		{
+			throw new InvalidMatchConditionException("A negative value was specified for the number of matches.");
 		}
 		else if(callback == null)
 		{
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		init(callback, matcher, startTimes);
-	}
-
-	public MatcherOfGreedyQuantity(IContinuationMatcher<T> matcher, int startTimes)
-	{
-		if(matcher == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
-		}
-
-		init(null, matcher, startTimes);
-	}
-
-	protected void init(IOnMatch<T> callback, IContinuationMatcher<T> matcher, int startTimes)
-	{
-		if(startTimes < 0)
-		{
-			throw new InvalidMatchConditionException("A negative value was specified for the number of matches.");
-		}
 		this.matcher = matcher;
 		this.startTimes = startTimes;
 		this.callback = callback;
+		this.emptyCallback = (str, start, end, m) -> Optional.empty();
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary) {
+	public Optional<MatchResult<R>> match(String str, int start, boolean temporary) {
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -93,22 +80,24 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 			}
 		}
 
-		if(callback == null || temporary)
+		if(temporary)
 		{
-			return Optional.of(MatchResult.of(new Range(start, current), Optional.empty()));
+			return Optional.of(
+					MatchResult.of(
+							new Range(start, current),
+								emptyCallback.onmatch(str, start, current, Optional.empty())));
 		}
 		else
 		{
 			return Optional.of(
 					MatchResult.of(
 							new Range(start, current),
-								Optional.of(
-									callback.onmatch(str, start, current, Optional.empty()))));
+								callback.onmatch(str, start, current, Optional.empty())));
 		}
 	}
 
 	@Override
-	public Optional<MatchResultList<T>> matchl(String str, int start, boolean temporary) {
+	public Optional<MatchResultList<R>> matchl(String str, int start, boolean temporary) {
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -116,7 +105,7 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 
 		int current = start;
 		int l = str.length();
-		ArrayList<MatchResult<T>> resultList = new ArrayList<>();
+		ArrayList<MatchResult<R>> resultList = new ArrayList<>();
 
 		if(start < 0)
 		{
@@ -136,15 +125,15 @@ public abstract class MatcherOfGreedyQuantity<T> implements IMatcher<T>, IListMa
 				IContinuation<T> r = result.get();
 				MatchResult<T> m = r.result();
 
-				if(callback != null && !temporary)
+				if(temporary)
 				{
 					resultList.add(MatchResult.of(
-									m.range, Optional.of(
-										callback.onmatch(str, start, m.range.end, Optional.of(m)))));
+									m.range, emptyCallback.onmatch(str, start, m.range.end, Optional.of(m))));
 				}
 				else
 				{
-					resultList.add(m);
+					resultList.add(MatchResult.of(
+							m.range, callback.onmatch(str, start, m.range.end, Optional.of(m))));
 				}
 
 				if(current == m.range.end)
