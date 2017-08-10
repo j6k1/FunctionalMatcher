@@ -2,7 +2,7 @@ package FunctionalMatcher;
 
 import java.util.Optional;
 
-public class MatcherOfJust<T,R> implements IMatcher<R> {
+public class MatcherOfJust<T,R> implements IFixedLengthMatcher<R> {
 	protected IOnMatch<T,R> callback;
 	protected IOnMatch<T,R> emptyCallback;
 	protected String value;
@@ -46,6 +46,12 @@ public class MatcherOfJust<T,R> implements IMatcher<R> {
 		}
 
 		return new MatcherOfJust<Nothing,Nothing>((str, start, end, m) -> Optional.empty(), value);
+	}
+
+	@Override
+	public int length()
+	{
+		return value.length();
 	}
 
 	@Override

@@ -2,7 +2,7 @@ package FunctionalMatcher;
 
 import java.util.Optional;
 
-public class MatcherOfAnyChar<T,R> implements IMatcher<R> {
+public class MatcherOfAnyChar<T,R> implements IFixedLengthMatcher<R> {
 	protected IOnMatch<T,R> callback;
 	protected IOnMatch<T,R> emptyCallback;
 	protected boolean multiline;
@@ -33,6 +33,12 @@ public class MatcherOfAnyChar<T,R> implements IMatcher<R> {
 	{
 		return new MatcherOfAnyChar<Nothing,Nothing>(
 									(str, start, end, m) -> Optional.empty() , multiline);
+	}
+
+	@Override
+	public int length()
+	{
+		return 1;
 	}
 
 	@Override

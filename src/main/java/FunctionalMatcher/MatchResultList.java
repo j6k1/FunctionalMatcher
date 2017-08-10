@@ -47,6 +47,31 @@ public class MatchResultList<T> implements Iterable<MatchResult<T>>  {
 		return matcher.match(str, range.end, false);
 	}
 
+	public <R> Optional<MatchResult<R>> back(String str, IFixedLengthMatcher<R> matcher)
+	{
+		if(range.end - matcher.length() < 0) return Optional.empty();
+		else return matcher.match(str, range.end - matcher.length(), true).map(r -> {
+			return MatchResult.of(new Range(range.end, range.end), Optional.empty());
+		});
+	}
+
+	public <R> Optional<MatchResult<R>> back(String str, MatcherOfFixedLengthSelect<R> matcher)
+	{
+		for(IFixedLengthMatcher<R> m: matcher)
+		{
+			if(range.end - m.length() >= 0)
+			{
+				Optional<MatchResult<R>> optR = m.match(str, range.end - m.length(), true);
+
+				if(optR.isPresent()) return optR.map(r -> {
+					return MatchResult.of(new Range(range.end, range.end), Optional.empty());
+				});
+			}
+		}
+
+		return Optional.empty();
+	}
+
 	public <R> Optional<MatchResultList<R>> nextl(String str, IListMatcher<R> matcher)
 	{
 		return matcher.matchl(str, range.end, false);
