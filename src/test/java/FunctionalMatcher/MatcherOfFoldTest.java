@@ -84,7 +84,7 @@ public class MatcherOfFoldTest {
 																)).add(MatcherOfNegativeCharacterClass.of(
 																	MatcherOfAsciiCharacterClass.of("\"")
 																)).match(str, start4, temporary4)
-																.map(r -> Continuation.of(new MatchResultType<Nothing>(), r));
+																.map(r -> Continuation.of(r));
 															}
 														)).match(str, r0.range.end, temporary3)
 														.flatMap(r1 -> {
@@ -103,7 +103,7 @@ public class MatcherOfFoldTest {
 												MatcherOfAsciiCharacterClass.of(",\r\n")
 											).match(str, start3, temporary3)
 											.map(r -> {
-												return Continuation.of(new MatchResultType<Nothing>(), r);
+												return Continuation.of(r);
 											});
 										}
 									)).match(str, start2, temporary2)
@@ -125,13 +125,11 @@ public class MatcherOfFoldTest {
 											if(r1.value.orElse(false))
 											{
 												return Termination.of(
-														new MatchResultType<String>(),
 														r0.compositeOf(r1.range.end));
 											}
 											else
 											{
 												return Continuation.of(
-														new MatchResultType<String>(),
 														r0.compositeOf(r1.range.end));
 											}
 										});
@@ -155,13 +153,11 @@ public class MatcherOfFoldTest {
 								if(r1.value.orElse(false).equals(Boolean.TRUE))
 								{
 									return Termination.of(
-											new MatchResultType<ArrayList<String>>(),
 											r0.compositeOf(r1.range.end));
 								}
 								else
 								{
 									return Continuation.of(
-											new MatchResultType<ArrayList<String>>(),
 											r0.compositeOf(r1.range.end));
 								}
 							});
