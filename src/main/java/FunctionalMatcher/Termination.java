@@ -3,7 +3,7 @@ package FunctionalMatcher;
 public class Termination<T> implements ITermination<T> {
 	protected MatchResult<T> result;
 
-	public Termination(MatchResult<T> result)
+	protected Termination(MatchResult<T> result)
 	{
 		this.result = result;
 	}
