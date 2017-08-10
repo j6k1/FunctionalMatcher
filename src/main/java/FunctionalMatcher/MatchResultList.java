@@ -49,9 +49,9 @@ public class MatchResultList<T> implements Iterable<MatchResult<T>>  {
 
 	public <R> Optional<MatchResult<R>> back(String str, IFixedLengthMatcher<R> matcher)
 	{
-		if(range.end - matcher.length() < 0) return Optional.empty();
-		else return matcher.match(str, range.end - matcher.length(), true).map(r -> {
-			return MatchResult.of(new Range(range.end, range.end), Optional.empty());
+		if(range.start - matcher.length() < 0) return Optional.empty();
+		else return matcher.match(str, range.start - matcher.length(), true).map(r -> {
+			return MatchResult.of(new Range(range.start, range.start), Optional.empty());
 		});
 	}
 
@@ -59,12 +59,12 @@ public class MatchResultList<T> implements Iterable<MatchResult<T>>  {
 	{
 		for(IFixedLengthMatcher<R> m: matcher)
 		{
-			if(range.end - m.length() >= 0)
+			if(range.start - m.length() >= 0)
 			{
-				Optional<MatchResult<R>> optR = m.match(str, range.end - m.length(), true);
+				Optional<MatchResult<R>> optR = m.match(str, range.start - m.length(), true);
 
 				if(optR.isPresent()) return optR.map(r -> {
-					return MatchResult.of(new Range(range.end, range.end), Optional.empty());
+					return MatchResult.of(new Range(range.start, range.start), Optional.empty());
 				});
 			}
 		}
