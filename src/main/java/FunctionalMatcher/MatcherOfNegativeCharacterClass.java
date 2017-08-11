@@ -3,9 +3,9 @@ package FunctionalMatcher;
 import java.util.Optional;
 
 public class MatcherOfNegativeCharacterClass<T,R> implements IMatcher<R> {
-	protected IOnMatch<T,R> callback;
-	protected IOnMatch<T,R> emptyCallback;
-	protected IMatcherOfCharacterClass<T> matcher;
+	protected final IOnMatch<T,R> callback;
+	protected final IOnMatch<T,R> emptyCallback;
+	protected final IMatcherOfCharacterClass<T> matcher;
 
 	protected MatcherOfNegativeCharacterClass(IOnMatch<T,R> callback, IMatcherOfCharacterClass<T> matcher)
 	{

@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.Optional;
 
 public class MatcherOfCharacterClass<T,R> implements IMatcherOfCharacterClass<R> {
-	protected IOnMatch<T,R> callback;
-	protected IOnMatch<T,R> emptyCallback;
+	protected final IOnMatch<T,R> callback;
+	protected final IOnMatch<T,R> emptyCallback;
 	protected final HashSet<Character> charactersSet = new HashSet<>();
 
 	protected MatcherOfCharacterClass(IOnMatch<T,R> callback, String characters)

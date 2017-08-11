@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class MatcherOfLongestInRange<T,R> implements IMatcher<R>, IListMatcher<R> {
-	protected int startTimes;
-	protected int endTimes;
-	protected IOnMatch<T,R> callback;
-	protected IOnMatch<T,R> emptyCallback;
-	protected IMatcher<T> matcher;
-	protected IMatcher<T> anchor;
+	protected final int startTimes;
+	protected final int endTimes;
+	protected final IOnMatch<T,R> callback;
+	protected final IOnMatch<T,R> emptyCallback;
+	protected final IMatcher<T> matcher;
+	protected final IMatcher<T> anchor;
 
 	protected MatcherOfLongestInRange(IOnMatch<T,R> callback,
 										IMatcher<T> matcher,

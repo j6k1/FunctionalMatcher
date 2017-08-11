@@ -3,9 +3,9 @@ package FunctionalMatcher;
 import java.util.Optional;
 
 public class MatcherOfOneOrZero<T,R> implements IMatcher<R> {
-	protected IOnMatch<T,R> callback;
-	protected IOnMatch<T,R> emptyCallback;
-	protected IMatcher<T> matcher;
+	protected final IOnMatch<T,R> callback;
+	protected final IOnMatch<T,R> emptyCallback;
+	protected final IMatcher<T> matcher;
 
 	protected MatcherOfOneOrZero(IOnMatch<T,R> callback, IMatcher<T> matcher)
 	{

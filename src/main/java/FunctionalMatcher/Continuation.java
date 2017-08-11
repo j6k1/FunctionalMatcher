@@ -1,7 +1,7 @@
 package FunctionalMatcher;
 
 public class Continuation<T> implements IContinuation<T> {
-	protected MatchResult<T> result;
+	protected final MatchResult<T> result;
 
 	protected Continuation(MatchResult<T> result)
 	{

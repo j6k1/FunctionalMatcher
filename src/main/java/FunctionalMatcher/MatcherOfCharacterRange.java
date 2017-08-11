@@ -3,10 +3,10 @@ package FunctionalMatcher;
 import java.util.Optional;
 
 public class MatcherOfCharacterRange<T,R> implements IMatcherOfCharacterClass<R> {
-	protected IOnMatch<T,R> callback;
-	protected IOnMatch<T,R> emptyCallback;
-	protected char codeStart;
-	protected char codeEnd;
+	protected final IOnMatch<T,R> callback;
+	protected final IOnMatch<T,R> emptyCallback;
+	protected final char codeStart;
+	protected final char codeEnd;
 
 	protected MatcherOfCharacterRange(IOnMatch<T,R> callback, char codeStart, char codeEnd)
 	{

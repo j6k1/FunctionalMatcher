@@ -1,7 +1,7 @@
 package FunctionalMatcher;
 
 public class Termination<T> implements ITermination<T> {
-	protected MatchResult<T> result;
+	protected final MatchResult<T> result;
 
 	protected Termination(MatchResult<T> result)
 	{

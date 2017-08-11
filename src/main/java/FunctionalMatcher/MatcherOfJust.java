@@ -3,15 +3,31 @@ package FunctionalMatcher;
 import java.util.Optional;
 
 public class MatcherOfJust<T,R> implements IFixedLengthMatcher<R> {
-	protected IOnMatch<T,R> callback;
-	protected IOnMatch<T,R> emptyCallback;
-	protected String value;
+	protected final IOnMatch<T,R> callback;
+	protected final IOnMatch<T,R> emptyCallback;
+	protected final String value;
+	protected final boolean ignoreCase;
 
-	protected MatcherOfJust(IOnMatch<T,R> callback, String value)
+	protected MatcherOfJust(IOnMatch<T,R> callback, String value, boolean ignoreCase)
 	{
 		this.value = value;
+		this.ignoreCase = ignoreCase;
 		this.callback = callback;
 		this.emptyCallback = (str, start, end, m) -> Optional.empty();
+	}
+
+	public static <T,R> MatcherOfJust<T,R> of(IOnMatch<T,R> callback, String value, boolean ignoreCase)
+	{
+		if(value == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument value is null.");
+		}
+		else if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
+		return new MatcherOfJust<T,R>(callback, value, ignoreCase);
 	}
 
 	public static <T,R> MatcherOfJust<T,R> of(IOnMatch<T,R> callback, String value)
@@ -25,7 +41,17 @@ public class MatcherOfJust<T,R> implements IFixedLengthMatcher<R> {
 			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
 		}
 
-		return new MatcherOfJust<T,R>(callback, value);
+		return new MatcherOfJust<T,R>(callback, value, false);
+	}
+
+	public static <T> MatcherOfJust<T,T> of(MatchResultType<T> t, String value, boolean ignoreCase)
+	{
+		if(value == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument value is null.");
+		}
+
+		return new MatcherOfJust<T,T>((str, start, end, m) -> Optional.empty(), value, ignoreCase);
 	}
 
 	public static <T> MatcherOfJust<T,T> of(MatchResultType<T> t, String value)
@@ -35,7 +61,17 @@ public class MatcherOfJust<T,R> implements IFixedLengthMatcher<R> {
 			throw new NullReferenceNotAllowedException("The reference to the argument value is null.");
 		}
 
-		return new MatcherOfJust<T,T>((str, start, end, m) -> Optional.empty(), value);
+		return new MatcherOfJust<T,T>((str, start, end, m) -> Optional.empty(), value, false);
+	}
+
+	public static MatcherOfJust<Nothing,Nothing> of(String value, boolean ignoreCase)
+	{
+		if(value == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument value is null.");
+		}
+
+		return new MatcherOfJust<Nothing,Nothing>((str, start, end, m) -> Optional.empty(), value, ignoreCase);
 	}
 
 	public static MatcherOfJust<Nothing,Nothing> of(String value)
@@ -45,7 +81,7 @@ public class MatcherOfJust<T,R> implements IFixedLengthMatcher<R> {
 			throw new NullReferenceNotAllowedException("The reference to the argument value is null.");
 		}
 
-		return new MatcherOfJust<Nothing,Nothing>((str, start, end, m) -> Optional.empty(), value);
+		return new MatcherOfJust<Nothing,Nothing>((str, start, end, m) -> Optional.empty(), value, false);
 	}
 
 	@Override
@@ -72,7 +108,12 @@ public class MatcherOfJust<T,R> implements IFixedLengthMatcher<R> {
 		{
 			throw new InvalidMatchStateException("The current position is outside the content range.");
 		}
-		else if(start == l || !str.startsWith(value, start)) return Optional.empty();
+		else if(start == l || start + value.length() > l ||
+				(ignoreCase && str.substring(start, start + value.length()).equalsIgnoreCase(value)) ||
+				(!ignoreCase && !str.startsWith(value, start)))
+		{
+			return Optional.empty();
+		}
 		else if(temporary)
 		{
 			return Optional.of(

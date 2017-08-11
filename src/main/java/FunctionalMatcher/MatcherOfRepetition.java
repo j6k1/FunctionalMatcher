@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class MatcherOfRepetition<T,R> implements IMatcher<R>, IListMatcher<R> {
-	protected IOnMatch<T,R> callback;
-	protected IOnMatch<T,R> emptyCallback;
-	protected IMatcher<T> matcher;
-	protected int times;
+	protected final IOnMatch<T,R> callback;
+	protected final IOnMatch<T,R> emptyCallback;
+	protected final IMatcher<T> matcher;
+	protected final int times;
 
 	protected MatcherOfRepetition(IOnMatch<T,R> callback, IMatcher<T> matcher, int times)
 	{

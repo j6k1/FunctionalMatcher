@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class MatcherOfSelect<T,R> implements IMatcher<R> {
-	protected IOnMatch<T,R> callback;
-	protected IOnMatch<T,R> emptyCallback;
-	protected ArrayList<IMatcher<T>> matcherList;
+	protected final IOnMatch<T,R> callback;
+	protected final IOnMatch<T,R> emptyCallback;
+	protected final ArrayList<IMatcher<T>> matcherList;
 
 	protected MatcherOfSelect(IOnMatch<T,R> callback, ArrayList<IMatcher<T>> matcherList)
 	{

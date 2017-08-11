@@ -3,8 +3,8 @@ package FunctionalMatcher;
 import java.util.Optional;
 
 public class MatcherOfTerminateWithNewLine<T,R> implements IMatcher<R> {
-	protected IOnMatch<T,R> callback;
-	protected IOnMatch<T,R> emptyCallback;
+	protected final IOnMatch<T,R> callback;
+	protected final IOnMatch<T,R> emptyCallback;
 
 	protected MatcherOfTerminateWithNewLine(IOnMatch<T,R> callback)
 	{

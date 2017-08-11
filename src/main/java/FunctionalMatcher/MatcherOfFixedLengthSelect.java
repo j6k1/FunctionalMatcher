@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class MatcherOfFixedLengthSelect<T> implements Iterable<IFixedLengthMatcher<T>> {
-	protected ArrayList<IFixedLengthMatcher<T>> matcherList;
+	protected final ArrayList<IFixedLengthMatcher<T>> matcherList;
 
 	protected MatcherOfFixedLengthSelect(ArrayList<IFixedLengthMatcher<T>> matcherList)
 	{

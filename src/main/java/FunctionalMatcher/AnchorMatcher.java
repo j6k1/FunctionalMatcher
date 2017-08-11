@@ -3,7 +3,7 @@ package FunctionalMatcher;
 import java.util.Optional;
 
 public class AnchorMatcher<T> implements IMatcher<T> {
-	protected IMatcher<T> matcher;
+	protected final IMatcher<T> matcher;
 
 	protected AnchorMatcher(IMatcher<T> matcher)
 	{

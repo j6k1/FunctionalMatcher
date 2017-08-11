@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class MatcherOfCharacterClassMultiple<T,R> implements IFixedLengthMatcher<R> {
-	protected IOnMatch<T,R> callback;
-	protected IOnMatch<T,R> emptyCallback;
+	protected final IOnMatch<T,R> callback;
+	protected final IOnMatch<T,R> emptyCallback;
 	protected final ArrayList<IMatcherOfCharacterClass<T>> matcherList = new ArrayList<>();
 
 	protected MatcherOfCharacterClassMultiple(IOnMatch<T,R> callback, ArrayList<IMatcherOfCharacterClass<T>> matcherList)

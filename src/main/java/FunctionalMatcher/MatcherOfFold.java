@@ -3,9 +3,9 @@ package FunctionalMatcher;
 import java.util.Optional;
 
 public class MatcherOfFold<T,R> implements IMatcher<R> {
-	protected IOnListMatch<T,R> callback;
-	protected IOnMatch<T,R> emptyCallback;
-	protected IListMatcher<T> matcher;
+	protected final IOnListMatch<T,R> callback;
+	protected final IOnMatch<T,R> emptyCallback;
+	protected final IListMatcher<T> matcher;
 
 	protected MatcherOfFold(IOnListMatch<T,R> callback, IListMatcher<T> matcher)
 	{

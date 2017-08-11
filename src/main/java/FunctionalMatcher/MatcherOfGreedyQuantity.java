@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public abstract class MatcherOfGreedyQuantity<T,R> implements IMatcher<R>, IListMatcher<R> {
-	protected int startTimes;
-	protected IOnMatch<T,R> callback;
-	protected IOnMatch<T,R> emptyCallback;
-	protected IContinuationMatcher<T> matcher;
+	protected final int startTimes;
+	protected final IOnMatch<T,R> callback;
+	protected final IOnMatch<T,R> emptyCallback;
+	protected final IContinuationMatcher<T> matcher;
 
 	protected MatcherOfGreedyQuantity(IOnMatch<T,R> callback, IContinuationMatcher<T> matcher, int startTimes)
 	{

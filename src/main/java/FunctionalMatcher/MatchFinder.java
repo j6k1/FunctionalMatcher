@@ -3,8 +3,8 @@ package FunctionalMatcher;
 import java.util.Optional;
 
 public class MatchFinder<T> implements IMatchFinder<T> {
-	protected IMatcher<T> matcher;
-	protected String str;
+	protected final IMatcher<T> matcher;
+	protected final String str;
 	protected int start;
 
 	protected MatchFinder(IMatcher<T> matcher, String str, int start)

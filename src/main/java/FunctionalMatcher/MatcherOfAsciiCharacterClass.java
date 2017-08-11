@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public class MatcherOfAsciiCharacterClass<T,R> implements IMatcherOfCharacterClass<R> {
-	protected IOnMatch<T,R> callback;
-	protected IOnMatch<T,R> emptyCallback;
+	protected final IOnMatch<T,R> callback;
+	protected final IOnMatch<T,R> emptyCallback;
 	protected final boolean[] characterMap;
 
 	{

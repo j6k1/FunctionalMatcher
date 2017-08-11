@@ -3,9 +3,9 @@ package FunctionalMatcher;
 import java.util.Optional;
 
 public class MatcherOfAnyChar<T,R> implements IFixedLengthMatcher<R> {
-	protected IOnMatch<T,R> callback;
-	protected IOnMatch<T,R> emptyCallback;
-	protected boolean multiline;
+	protected final IOnMatch<T,R> callback;
+	protected final IOnMatch<T,R> emptyCallback;
+	protected final boolean multiline;
 
 	protected MatcherOfAnyChar(IOnMatch<T,R> callback, boolean multiline)
 	{

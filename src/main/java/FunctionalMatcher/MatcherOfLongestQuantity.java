@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public abstract class MatcherOfLongestQuantity<T,R> implements IMatcher<R>, IListMatcher<R> {
-	protected int startTimes;
-	protected IOnMatch<T,R> callback;
-	protected IOnMatch<T,R> emptyCallback;
-	protected IMatcher<T> matcher;
-	protected IMatcher<T> anchor;
+	protected final int startTimes;
+	protected final IOnMatch<T,R> callback;
+	protected final IOnMatch<T,R> emptyCallback;
+	protected final IMatcher<T> matcher;
+	protected final IMatcher<T> anchor;
 
 	protected MatcherOfLongestQuantity(IOnMatch<T,R> callback,
 										IMatcher<T> matcher, IMatcher<T> anchor, int startTimes)
