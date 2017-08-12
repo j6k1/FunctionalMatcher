@@ -3,7 +3,7 @@ package FunctionalMatcher;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class MatcherOfCharacterClassMultiple<T,R> implements IFixedLengthMatcher<R> {
+public class MatcherOfCharacterClassMultiple<T,R> implements IMatcherOfCharacterClass<R> {
 	protected final IOnMatch<T,R> callback;
 	protected final IOnMatch<T,R> emptyCallback;
 	protected final ArrayList<IMatcherOfCharacterClass<T>> matcherList = new ArrayList<>();
@@ -97,12 +97,6 @@ public class MatcherOfCharacterClassMultiple<T,R> implements IFixedLengthMatcher
 
 		matcherList.add(matcher);
 		return this;
-	}
-
-	@Override
-	public int length()
-	{
-		return 1;
 	}
 
 	@Override
