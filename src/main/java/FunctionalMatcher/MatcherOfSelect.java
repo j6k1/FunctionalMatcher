@@ -83,7 +83,7 @@ public class MatcherOfSelect<T,R> implements IMatcher<R> {
 		}, lst);
 	}
 
-	public MatcherOfSelect<T,R> add(IMatcher<T> matcher)
+	public MatcherOfSelect<T,R> or(IMatcher<T> matcher)
 	{
 		if(matcher == null)
 		{

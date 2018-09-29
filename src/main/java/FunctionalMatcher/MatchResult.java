@@ -22,9 +22,9 @@ public class MatchResult<T> {
 		return matcher.match(str, range.end, false);
 	}
 
-	public <R> Optional<IContinuation<R>> next(String str, IContinuationMatcher<R> matcher)
+	public <R> Optional<MatchResult<T>> skip(String str, IMatcher<R> matcher)
 	{
-		return matcher.matchc(str, range.end, false);
+		return matcher.match(str, range.end, true).map(r -> this.compositeOfEnd(r.range.end));
 	}
 
 	public <R> Optional<MatchResult<R>> back(String str, IFixedLengthMatcher<R> matcher)
@@ -75,6 +75,11 @@ public class MatchResult<T> {
 	public MatchResult<T> compositeOfStart(int start)
 	{
 		return MatchResult.of(new Range(start, range.end), value);
+	}
+
+	public MatchResult<T> compositeOfEnd(int end)
+	{
+		return MatchResult.of(new Range(range.start, end), value);
 	}
 
 	@Override

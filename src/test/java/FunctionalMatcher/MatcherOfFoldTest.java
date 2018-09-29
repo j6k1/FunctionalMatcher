@@ -81,7 +81,7 @@ public class MatcherOfFoldTest {
 															(str4, start4, temporary4) -> {
 																return (MatcherOfSelect.of(
 																	MatcherOfJust.of("\"\"")
-																)).add(MatcherOfNegativeCharacterClass.of(
+																)).or(MatcherOfNegativeCharacterClass.of(
 																	MatcherOfAsciiCharacterClass.of("\"")
 																)).match(str, start4, temporary4)
 																.map(r -> Continuation.of(r));
@@ -95,7 +95,7 @@ public class MatcherOfFoldTest {
 													});
 
 										}
-									).add(MatcherOfGreedyZeroOrMore.of(
+									).or(MatcherOfGreedyZeroOrMore.of(
 										(str3, start3, end3, m) -> {
 											return Optional.of(str.substring(start3, end3));
 										}, (String str3, int start3, boolean temporary3) -> {
@@ -112,11 +112,11 @@ public class MatcherOfFoldTest {
 												MatcherOfJust.of((str3, start3, end3, m) -> {
 													return Optional.of(false);
 												}, ",")
-											)).add(MatcherOfAsciiCharacterClass.of(
+											)).or(MatcherOfAsciiCharacterClass.of(
 												(str3, start3, end3, m) -> {
 													return Optional.of(true);
 												}, "\r\n")
-											).add(MatcherOfEndOfContent.of(
+											).or(MatcherOfEndOfContent.of(
 												(str3, start3, end3, m) -> {
 													return Optional.of(true);
 												})
@@ -144,7 +144,7 @@ public class MatcherOfFoldTest {
 											return Optional.of(false);
 										}, ",\r\n")
 								))
-								.add(MatcherOfEndOfContent.of(
+								.or(MatcherOfEndOfContent.of(
 										(str2, start2, end2, m) -> {
 											return Optional.of(true);
 										}))

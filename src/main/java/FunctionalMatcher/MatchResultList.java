@@ -47,6 +47,11 @@ public class MatchResultList<T> implements Iterable<MatchResult<T>>  {
 		return matcher.match(str, range.end, false);
 	}
 
+	public <R> Optional<MatchResultList<T>> skip(String str, IMatcher<R> matcher)
+	{
+		return matcher.match(str, range.end, true).map(r -> this.compositeOfEnd(r.range.end));
+	}
+
 	public <R> Optional<MatchResult<R>> back(String str, IFixedLengthMatcher<R> matcher)
 	{
 		if(range.start - matcher.length() < 0) return Optional.empty();
@@ -100,6 +105,11 @@ public class MatchResultList<T> implements Iterable<MatchResult<T>>  {
 	public MatchResultList<T> compositeOfStart(int start)
 	{
 		return MatchResultList.of(new Range(start, range.end), results);
+	}
+
+	public MatchResultList<T> compositeOfEnd(int end)
+	{
+		return MatchResultList.of(new Range(range.start, end), results);
 	}
 
 	@Override
