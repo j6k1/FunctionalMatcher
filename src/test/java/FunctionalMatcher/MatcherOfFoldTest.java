@@ -155,9 +155,7 @@ public class MatcherOfFoldTest {
 						});
 					})
 				).match(str, start, temporary)
-				.flatMap(r0 -> {
-					return r0.next(str, MatcherOfEndOfContent.of()).map(r1 -> r0);
-				});
+				.flatMap(r0 -> r0.skip(str, MatcherOfEndOfContent.of()));
 		}), org.hamcrest.core.Is.<Optional<MatchResult<ArrayList<ArrayList<String>>>>>is(
 					Optional.of(MatchResult.of(new Range(0, csv.length()),Optional.of(
 						new ArrayList<ArrayList<String>>() {{
