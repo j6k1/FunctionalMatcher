@@ -17,31 +17,31 @@ public class MatchResult<T> {
 		return new MatchResult<T>(range, value);
 	}
 
-	public <R> Optional<MatchResult<R>> next(String str, IMatcher<R> matcher)
+	public <R> Optional<MatchResult<R>> next(State state, IMatcher<R> matcher)
 	{
-		return matcher.match(str, range.end, false);
+		return matcher.match(State.of(state.str, range.end, false));
 	}
 
-	public <R> Optional<MatchResult<T>> skip(String str, IMatcher<R> matcher)
+	public <R> Optional<MatchResult<T>> skip(State state, IMatcher<R> matcher)
 	{
-		return matcher.match(str, range.end, true).map(r -> this.compositeOfEnd(r.range.end));
+		return matcher.match(State.of(state.str, range.end, true)).map(r -> this.compositeOfEnd(r.range.end));
 	}
 
-	public <R> Optional<MatchResult<R>> back(String str, IFixedLengthMatcher<R> matcher)
+	public <R> Optional<MatchResult<R>> back(State state, IFixedLengthMatcher<R> matcher)
 	{
 		if(range.start - matcher.length() < 0) return Optional.empty();
-		else return matcher.match(str, range.start - matcher.length(), true).map(r -> {
+		else return matcher.match(State.of(state.str, range.start - matcher.length(), true)).map(r -> {
 			return MatchResult.of(new Range(range.start, range.start), Optional.empty());
 		});
 	}
 
-	public <R> Optional<MatchResult<R>> back(String str, MatcherOfFixedLengthSelect<R> matcher)
+	public <R> Optional<MatchResult<R>> back(State state, MatcherOfFixedLengthSelect<R> matcher)
 	{
 		for(IFixedLengthMatcher<R> m: matcher)
 		{
 			if(range.start - m.length() >= 0)
 			{
-				Optional<MatchResult<R>> optR = m.match(str, range.start - m.length(), true);
+				Optional<MatchResult<R>> optR = m.match(State.of(state.str, range.start - m.length(), true));
 
 				if(optR.isPresent()) return optR.map(r -> {
 					return MatchResult.of(new Range(range.start, range.start), Optional.empty());

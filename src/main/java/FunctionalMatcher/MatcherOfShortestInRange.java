@@ -79,7 +79,16 @@ public class MatcherOfShortestInRange<T,R> implements IMatcher<R>, IListMatcher<
 	}
 
 	@Override
-	public Optional<MatchResult<R>> match(String str, int start, boolean temporary) {
+	public Optional<MatchResult<R>> match(State state) {
+		if(state == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
+		}
+
+		final String str = state.str;
+		final int start = state.start;
+		final boolean temporary = state.temporary;
+
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -99,11 +108,11 @@ public class MatcherOfShortestInRange<T,R> implements IMatcher<R>, IListMatcher<
 
 		for(int i=0; i < endTimes && current <= l; i++)
 		{
-			Optional<MatchResult<T>> result = matcher.match(str, current, temporary);
+			Optional<MatchResult<T>> result = matcher.match(State.of(str, current, temporary));
 
 			MatchResult<T> m = null;
 
-			if(result.isPresent() && anchor.match(str, (m = result.get()).range.end, true).isPresent())
+			if(result.isPresent() && anchor.match(State.of(str, (m = result.get()).range.end, true)).isPresent())
 			{
 				if(i + 1 >= startTimes)
 				{
@@ -145,7 +154,16 @@ public class MatcherOfShortestInRange<T,R> implements IMatcher<R>, IListMatcher<
 	}
 
 	@Override
-	public Optional<MatchResultList<R>> matchl(String str, int start, boolean temporary) {
+	public Optional<MatchResultList<R>> matchl(State state) {
+		if(state == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
+		}
+
+		final String str = state.str;
+		final int start = state.start;
+		final boolean temporary = state.temporary;
+
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -167,7 +185,7 @@ public class MatcherOfShortestInRange<T,R> implements IMatcher<R>, IListMatcher<
 
 		for(int i=0; i < endTimes && current <= l; i++)
 		{
-			Optional<MatchResult<T>> result = matcher.match(str, current, temporary);
+			Optional<MatchResult<T>> result = matcher.match(State.of(str, current, temporary));
 
 			if(result.isPresent())
 			{
@@ -184,7 +202,7 @@ public class MatcherOfShortestInRange<T,R> implements IMatcher<R>, IListMatcher<
 							m.range, callback.onmatch(str, start, m.range.end, Optional.of(m))));
 				}
 
-				if(anchor.match(str, (m = result.get()).range.end, true).isPresent())
+				if(anchor.match(State.of(str, (m = result.get()).range.end, true)).isPresent())
 				{
 					current = m.range.end;
 					lastEnd = current;

@@ -31,7 +31,16 @@ public abstract class MatcherOfGreedyQuantity<T,R> implements IMatcher<R>, IList
 	}
 
 	@Override
-	public Optional<MatchResult<R>> match(String str, int start, boolean temporary) {
+	public Optional<MatchResult<R>> match(State state) {
+		if(state == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
+		}
+
+		final String str = state.str;
+		final int start = state.start;
+		final boolean temporary = state.temporary;
+
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -50,7 +59,7 @@ public abstract class MatcherOfGreedyQuantity<T,R> implements IMatcher<R>, IList
 
 		for(int i=0; current <= l; i++)
 		{
-			Optional<IContinuation<T>> result = matcher.matchc(str, current, temporary);
+			Optional<IContinuation<T>> result = matcher.matchc(State.of(str, current, temporary));
 
 			if(result.isPresent())
 			{
@@ -97,7 +106,16 @@ public abstract class MatcherOfGreedyQuantity<T,R> implements IMatcher<R>, IList
 	}
 
 	@Override
-	public Optional<MatchResultList<R>> matchl(String str, int start, boolean temporary) {
+	public Optional<MatchResultList<R>> matchl(State state) {
+		if(state == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
+		}
+
+		final String str = state.str;
+		final int start = state.start;
+		final boolean temporary = state.temporary;
+
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -118,7 +136,7 @@ public abstract class MatcherOfGreedyQuantity<T,R> implements IMatcher<R>, IList
 
 		for(int i=0; current <= l; i++)
 		{
-			Optional<IContinuation<T>> result = matcher.matchc(str, current, temporary);
+			Optional<IContinuation<T>> result = matcher.matchc(State.of(str, current, temporary));
 
 			if(result.isPresent())
 			{

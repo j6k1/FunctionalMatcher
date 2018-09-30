@@ -96,8 +96,17 @@ public class MatcherOfSelect<T,R> implements IMatcher<R> {
 	}
 
 	@Override
-	public Optional<MatchResult<R>> match(String str, int start, boolean temporary)
+	public Optional<MatchResult<R>> match(State state)
 	{
+		if(state == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
+		}
+
+		final String str = state.str;
+		final int start = state.start;
+		final boolean temporary = state.temporary;
+
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -118,7 +127,7 @@ public class MatcherOfSelect<T,R> implements IMatcher<R> {
 		{
 			for(IMatcher<T> matcher: matcherList)
 			{
-				Optional<MatchResult<T>> result = matcher.match(str, start, temporary);
+				Optional<MatchResult<T>> result = matcher.match(state);
 
 				if(result.isPresent())
 				{

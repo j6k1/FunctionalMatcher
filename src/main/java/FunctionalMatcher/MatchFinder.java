@@ -45,7 +45,7 @@ public class MatchFinder<T> implements IMatchFinder<T> {
 
 			Optional<MatchResult<T>> r = Optional.empty();
 
-			for(; index <= length && !(r = matcher.match(str, index, false)).isPresent(); index++);
+			for(; index <= length && !(r = matcher.match(State.of(str, index, false))).isPresent(); index++);
 
 			if(index <= length)	start = index;
 			else start = -1;

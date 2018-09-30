@@ -15,7 +15,7 @@ public class MatcherExecutor {
 			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
 		}
 
-		return matcher.match(str, 0, false);
+		return matcher.match(State.of(str, 0, false));
 	}
 
 	public static <T> IMatchFinder<T> find(String str, IMatcher<T> matcher)
@@ -40,7 +40,7 @@ public class MatcherExecutor {
 		{
 			Optional<MatchResult<T>> result = Optional.empty();
 
-			while(i <= l && !(result = matcher.match(str, i, false)).isPresent())
+			while(i <= l && !(result = matcher.match(State.of(str, i, false))).isPresent())
 			{
 				i++;
 			}

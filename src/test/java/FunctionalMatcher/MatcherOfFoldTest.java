@@ -50,8 +50,8 @@ public class MatcherOfFoldTest {
 	@Test
 	public void testMatch() {
 		assertThat(MatcherExecutor.exec(csv,
-				(str, start, temporary) -> {
-					return MatcherOfFold.of((str1, start1, end1, lst) -> {
+				(s1) -> {
+					return MatcherOfFold.of((str, start, end, lst) -> {
 						ArrayList<ArrayList<String>> csv = new ArrayList<>();
 						lst.stream().forEach(row -> {
 							row.value.ifPresent(r -> csv.add(r));
@@ -59,56 +59,56 @@ public class MatcherOfFoldTest {
 						return Optional.of(csv);
 					},
 					MatcherOfGreedyZeroOrMore.of(
-						(str1, start1, temporary1) -> {
+						(s2) -> {
 							return MatcherOfFold.of(
-								(str2, start2, end2, lst) -> {
+								(str, start, end, lst) -> {
 									ArrayList<String> row = new ArrayList<>();
 									lst.stream().forEach(f -> {
 										f.value.ifPresent(v -> row.add(v));
 									});
 									return Optional.of(row);
 								}, MatcherOfGreedyZeroOrMore.of(
-								(str2, start2, temporary2) -> {
+								(s3) -> {
 									return MatcherOfSelect.of(
-										(String str3, int start3, boolean temporary3) -> {
+										(s4) -> {
 											return MatcherOfJust.of("\"")
-												.match(str, start3, temporary3).flatMap(r0 -> {
-													return r0.next(str, MatcherOfGreedyZeroOrMore.of(
-														(str4, start4, end4, m) -> {
+												.match(s4).flatMap(r0 -> {
+													return r0.next(s4, MatcherOfGreedyZeroOrMore.of(
+														(str, start, end, m) -> {
 															return Optional.of(
-																	str.substring(start4, end4)
+																	str.substring(start, end)
 																		.replace("\"\"", "\""));
 														},
-														(str4, start4, temporary4) -> {
+														(s5) -> {
 															return MatcherOfSelect.of(
 																MatcherOfJust.of("\"\"")
 															).or(MatcherOfNegativeCharacterClass.of(
 																MatcherOfAsciiCharacterClass.of("\"")
-															)).match(str, start4, temporary4)
+															)).match(s5)
 															.map(r -> Continuation.of(r));
 														}
 													))
-													.flatMap(r1 -> r1.skip(str, MatcherOfJust.of("\"")));
+													.flatMap(r1 -> r1.skip(s4, MatcherOfJust.of("\"")));
 												});
 										}
 									).or(MatcherOfGreedyZeroOrMore.of(
-										(str3, start3, end3, m) -> {
-											return Optional.of(str.substring(start3, end3));
+										(str, start, end, m) -> {
+											return Optional.of(str.substring(start, end));
 										}, MatcherOfNegativeCharacterClass.of(
 											MatcherOfAsciiCharacterClass.of(",\r\n")
 										).toContinuation()
-									)).match(str, start2, temporary2)
+									)).match(s3)
 									.flatMap(r0 -> {
-										return r0.next(str, (MatcherOfSelect.of(
-												MatcherOfJust.of((str3, start3, end3, m) -> {
+										return r0.next(s3, (MatcherOfSelect.of(
+												MatcherOfJust.of((str, start, end, m) -> {
 													return Optional.of(false);
 												}, ",")
 											)).or(MatcherOfAsciiCharacterClass.of(
-												(str3, start3, end3, m) -> {
+												(str, start, end, m) -> {
 													return Optional.of(true);
 												}, "\r\n")
 											).or(MatcherOfEndOfContent.of(
-												(str3, start3, end3, m) -> {
+												(str, start, end, m) -> {
 													return Optional.of(true);
 												})
 											)
@@ -126,17 +126,17 @@ public class MatcherOfFoldTest {
 										});
 									});
 								}
-						)).match(str, start1, temporary1)
+						)).match(s2)
 						.flatMap(r0 -> {
-							return r0.next(str,
+							return r0.next(s2,
 								(MatcherOfSelect.of(
 									MatcherOfAsciiCharacterClass.of(
-										(str2, start2, end2, m) -> {
+										(str, start, end, m) -> {
 											return Optional.of(false);
 										}, ",\r\n")
 								))
 								.or(MatcherOfEndOfContent.of(
-										(str2, start2, end2, m) -> {
+										(str, start, end, m) -> {
 											return Optional.of(true);
 										}))
 							)
@@ -154,8 +154,8 @@ public class MatcherOfFoldTest {
 							});
 						});
 					})
-				).match(str, start, temporary)
-				.flatMap(r0 -> r0.skip(str, MatcherOfEndOfContent.of()));
+				).match(s1)
+				.flatMap(r0 -> r0.skip(s1, MatcherOfEndOfContent.of()));
 		}), org.hamcrest.core.Is.<Optional<MatchResult<ArrayList<ArrayList<String>>>>>is(
 					Optional.of(MatchResult.of(new Range(0, csv.length()),Optional.of(
 						new ArrayList<ArrayList<String>>() {{

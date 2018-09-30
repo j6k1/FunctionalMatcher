@@ -21,8 +21,12 @@ public class AnchorMatcher<T> implements IMatcher<T> {
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary) {
-		return matcher.match(str, start, true).map(r -> {
+	public Optional<MatchResult<T>> match(State state) {
+		if(state == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
+		}
+		return matcher.match(State.of(state.str, state.start, true)).map(r -> {
 			return MatchResult.of(r.range, Optional.empty());
 		});
 	}

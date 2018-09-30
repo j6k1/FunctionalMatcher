@@ -48,23 +48,32 @@ public class MatcherOfSequence<T> implements IMatcher<T>, IListMatcher<T> {
 	}
 
 	public <R> IMatcher<R> map(IOnMatch<T,R> callback) {
-		return (String str, int start, boolean temporary) -> {
-			return MatcherOfSequence.this.match(str, start, temporary).map(r -> {
-				return MatchResult.of(r.range, callback.onmatch(str, start, r.range.end, Optional.of(r)));
+		return (State state) -> {
+			return MatcherOfSequence.this.match(state).map(r -> {
+				return MatchResult.of(r.range, callback.onmatch(state.str, state.start, r.range.end, Optional.of(r)));
 			});
 		};
 	}
 
 	public <R> IMatcher<R> map(IOnListMatch<T,R> callback) {
-		return (String str, int start, boolean temporary) -> {
-			return MatcherOfSequence.this.matchl(str, start, temporary).map(r -> {
-				return MatchResult.of(r.range, callback.onmatch(str, start, r.range.end, r));
+		return (State state) -> {
+			return MatcherOfSequence.this.matchl(state).map(r -> {
+				return MatchResult.of(r.range, callback.onmatch(state.str, state.start, r.range.end, r));
 			});
 		};
 	}
 
 	@Override
-	public Optional<MatchResultList<T>> matchl(String str, int start, boolean temporary) {
+	public Optional<MatchResultList<T>> matchl(State state) {
+		if(state == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
+		}
+
+		final String str = state.str;
+		final int start = state.start;
+		final boolean temporary = state.temporary;
+
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -85,7 +94,7 @@ public class MatcherOfSequence<T> implements IMatcher<T>, IListMatcher<T> {
 
 		for(IMatcher<T> matcher: matcherList)
 		{
-			Optional<MatchResult<T>> result = matcher.match(str, current, temporary);
+			Optional<MatchResult<T>> result = matcher.match(State.of(str, current, temporary));
 
 			if(result.isPresent())
 			{
@@ -105,7 +114,16 @@ public class MatcherOfSequence<T> implements IMatcher<T>, IListMatcher<T> {
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary) {
+	public Optional<MatchResult<T>> match(State state) {
+		if(state == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
+		}
+
+		final String str = state.str;
+		final int start = state.start;
+		final boolean temporary = state.temporary;
+
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -125,7 +143,7 @@ public class MatcherOfSequence<T> implements IMatcher<T>, IListMatcher<T> {
 
 		for(IMatcher<T> matcher: matcherList)
 		{
-			Optional<MatchResult<T>> result = matcher.match(str, current, temporary);
+			Optional<MatchResult<T>> result = matcher.match(State.of(str, current, temporary));
 
 			if(result.isPresent())
 			{

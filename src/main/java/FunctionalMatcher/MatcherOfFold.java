@@ -29,7 +29,15 @@ public class MatcherOfFold<T,R> implements IMatcher<R> {
 	}
 
 	@Override
-	public Optional<MatchResult<R>> match(String str, int start, boolean temporary) {
+	public Optional<MatchResult<R>> match(State state) {
+		if(state == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
+		}
+
+		final String str = state.str;
+		final int start = state.start;
+
 		if(str == null)
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
@@ -45,7 +53,7 @@ public class MatcherOfFold<T,R> implements IMatcher<R> {
 		}
 		else
 		{
-			Optional<MatchResultList<T>> result = matcher.matchl(str, start, temporary);
+			Optional<MatchResultList<T>> result = matcher.matchl(state);
 
 			if(!result.isPresent())
 			{

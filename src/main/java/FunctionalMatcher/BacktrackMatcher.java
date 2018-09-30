@@ -21,10 +21,14 @@ public class BacktrackMatcher<T> implements IMatcher<T> {
 	}
 
 	@Override
-	public Optional<MatchResult<T>> match(String str, int start, boolean temporary) {
-		if(start - matcher.length() < 0) return Optional.empty();
-		else return matcher.match(str, start - matcher.length(), true).map(r -> {
-			return MatchResult.of(new Range(start, start), Optional.empty());
+	public Optional<MatchResult<T>> match(State state) {
+		if(state == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
+		}
+		if(state.start - matcher.length() < 0) return Optional.empty();
+		else return matcher.match(State.of(state.str, state.start - matcher.length(), true)).map(r -> {
+			return MatchResult.of(new Range(state.start, state.start), Optional.empty());
 		});
 	}
 }

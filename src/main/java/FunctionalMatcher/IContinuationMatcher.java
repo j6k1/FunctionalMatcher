@@ -4,5 +4,5 @@ import java.util.Optional;
 
 @FunctionalInterface
 public interface IContinuationMatcher<T> {
-	public Optional<IContinuation<T>> matchc(String str, int start, boolean temporary);
+	public Optional<IContinuation<T>> matchc(State state);
 }
