@@ -72,25 +72,24 @@ public class MatcherOfFoldTest {
 									return MatcherOfSelect.of(
 										(String str3, int start3, boolean temporary3) -> {
 											return MatcherOfJust.of("\"")
-													.match(str, start3, temporary3).flatMap(r0 -> {
-														return MatcherOfGreedyZeroOrMore.of(
-															(str4, start4, end4, m) -> {
-																return Optional.of(
-																		str.substring(start4, end4)
-																			.replace("\"\"", "\""));
-															},
-															(str4, start4, temporary4) -> {
-																return MatcherOfSelect.of(
-																	MatcherOfJust.of("\"\"")
-																).or(MatcherOfNegativeCharacterClass.of(
-																	MatcherOfAsciiCharacterClass.of("\"")
-																)).match(str, start4, temporary4)
-																.map(r -> Continuation.of(r));
-															}
-														).match(str, r0.range.end, temporary3)
-														.flatMap(r1 -> r1.skip(str, MatcherOfJust.of("\"")));
-													});
-
+												.match(str, start3, temporary3).flatMap(r0 -> {
+													return r0.next(str, MatcherOfGreedyZeroOrMore.of(
+														(str4, start4, end4, m) -> {
+															return Optional.of(
+																	str.substring(start4, end4)
+																		.replace("\"\"", "\""));
+														},
+														(str4, start4, temporary4) -> {
+															return MatcherOfSelect.of(
+																MatcherOfJust.of("\"\"")
+															).or(MatcherOfNegativeCharacterClass.of(
+																MatcherOfAsciiCharacterClass.of("\"")
+															)).match(str, start4, temporary4)
+															.map(r -> Continuation.of(r));
+														}
+													))
+													.flatMap(r1 -> r1.skip(str, MatcherOfJust.of("\"")));
+												});
 										}
 									).or(MatcherOfGreedyZeroOrMore.of(
 										(str3, start3, end3, m) -> {
