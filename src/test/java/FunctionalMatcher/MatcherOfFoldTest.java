@@ -94,14 +94,9 @@ public class MatcherOfFoldTest {
 									).or(MatcherOfGreedyZeroOrMore.of(
 										(str3, start3, end3, m) -> {
 											return Optional.of(str.substring(start3, end3));
-										}, (String str3, int start3, boolean temporary3) -> {
-											return MatcherOfNegativeCharacterClass.of(
-												MatcherOfAsciiCharacterClass.of(",\r\n")
-											).match(str, start3, temporary3)
-											.map(r -> {
-												return Continuation.of(r);
-											});
-										}
+										}, MatcherOfNegativeCharacterClass.of(
+											MatcherOfAsciiCharacterClass.of(",\r\n")
+										).toContinuation()
 									)).match(str, start2, temporary2)
 									.flatMap(r0 -> {
 										return r0.next(str, (MatcherOfSelect.of(
