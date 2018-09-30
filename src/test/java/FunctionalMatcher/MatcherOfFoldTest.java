@@ -46,6 +46,7 @@ public class MatcherOfFoldTest {
 		csv = String.join("\r\n", lines);
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void testMatch() {
 		assertThat(MatcherExecutor.exec(csv,
@@ -72,26 +73,22 @@ public class MatcherOfFoldTest {
 										(String str3, int start3, boolean temporary3) -> {
 											return MatcherOfJust.of("\"")
 													.match(str, start3, temporary3).flatMap(r0 -> {
-														return (MatcherOfGreedyZeroOrMore.of(
+														return MatcherOfGreedyZeroOrMore.of(
 															(str4, start4, end4, m) -> {
 																return Optional.of(
 																		str.substring(start4, end4)
 																			.replace("\"\"", "\""));
 															},
 															(str4, start4, temporary4) -> {
-																return (MatcherOfSelect.of(
+																return MatcherOfSelect.of(
 																	MatcherOfJust.of("\"\"")
-																)).or(MatcherOfNegativeCharacterClass.of(
+																).or(MatcherOfNegativeCharacterClass.of(
 																	MatcherOfAsciiCharacterClass.of("\"")
 																)).match(str, start4, temporary4)
 																.map(r -> Continuation.of(r));
 															}
-														)).match(str, r0.range.end, temporary3)
-														.flatMap(r1 -> {
-															return r1.next(str, MatcherOfJust.of("\"")).map(r2 -> {
-																return MatchResult.of(r0.range.compositeOf(r2.range), r1.value);
-															});
-														});
+														).match(str, r0.range.end, temporary3)
+														.flatMap(r1 -> r1.skip(str, MatcherOfJust.of("\"")));
 													});
 
 										}
