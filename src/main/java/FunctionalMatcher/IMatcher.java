@@ -10,9 +10,16 @@ public interface IMatcher<T> {
 		sequence.seq(matcher);
 		return sequence;
 	}
+
 	default IContinuationMatcher<T> toContinuation() {
 		return (state) -> {
 			return this.match(state).map(r -> Continuation.of(r));
+		};
+	}
+
+	default <R> IContinuationMatcher<R> toContinuation(IContinuationCreator<T,R> creator) {
+		return (state) -> {
+			return this.match(state).map(r -> creator.create(r));
 		};
 	}
 }

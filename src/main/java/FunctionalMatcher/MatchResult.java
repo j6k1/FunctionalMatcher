@@ -22,6 +22,11 @@ public class MatchResult<T> {
 		return matcher.match(State.of(state.str, range.end, false));
 	}
 
+	public <R> Optional<IContinuation<R>> next(State state, IContinuationMatcher<R> matcher)
+	{
+		return matcher.matchc(State.of(state.str, range.end, false));
+	}
+
 	public <R> Optional<MatchResult<T>> skip(State state, IMatcher<R> matcher)
 	{
 		return matcher.match(State.of(state.str, range.end, true)).map(r -> this.compositeOfEnd(r.range.end));
