@@ -84,9 +84,8 @@ public class MatcherOfFoldTest {
 														).or(MatcherOfNegativeCharacterClass.of(
 															MatcherOfAsciiCharacterClass.of("\"")
 														)).toContinuation()
-												))
-													.flatMap(r1 -> r1.skip(s4, MatcherOfJust.of("\"")));
-												});
+												)).flatMap(r1 -> r1.skip(s4, MatcherOfJust.of("\"")));
+											});
 										}
 									).or(MatcherOfGreedyZeroOrMore.of(
 										(str, start, end, m) -> {
