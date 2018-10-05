@@ -22,4 +22,18 @@ public interface IMatcher<T> {
 			return this.match(state).map(r -> creator.create(r));
 		};
 	}
+
+	default <R> IMatcher<R> next(IMatcher<R> n) {
+		return (state) -> {
+			return this.match(state).flatMap(r -> n.match(State.of(state.str, r.range.end, state.temporary)));
+		};
+	}
+
+	default <R> IMatcher<T> skip(IMatcher<R> n) {
+		return (state) -> {
+			return this.match(state).flatMap(r -> {
+				return n.match(State.of(state.str, r.range.end, state.temporary)).map(rn -> r);
+			});
+		};
+	}
 }
