@@ -36,8 +36,7 @@ public class BacktrackSelectMatcher<T> implements IMatcher<T> {
 			{
 				Optional<MatchResult<T>> optR = m.match(
 													State.of(state.str,
-															state.start - m.length(),
-															state.temporary));
+															state.start - m.length(), true));
 
 				if(optR.isPresent()) {
 					return Optional.of(MatchResult.of(new Range(state.start, state.start), Optional.empty()));
