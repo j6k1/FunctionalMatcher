@@ -49,91 +49,60 @@ public class MatcherOfFoldTest {
 	@SuppressWarnings("serial")
 	@Test
 	public void testMatch() {
-		assertThat(MatcherExecutor.exec(csv,
-				(s1) -> {
-					return MatcherOfFold.of((str, start, end, lst) -> {
-						ArrayList<ArrayList<String>> csv = new ArrayList<>();
-						lst.stream().forEach(row -> {
-							row.value.ifPresent(r -> csv.add(r));
+		assertThat(MatcherExecutor.exec(csv, s1 -> MatcherOfFold.of(
+			(str, start, end, lst) -> {
+				ArrayList<ArrayList<String>> csv = new ArrayList<>();
+				lst.stream().forEach(row -> {
+					row.value.ifPresent(r -> csv.add(r));
+				});
+				return Optional.of(csv);
+			},
+			MatcherOfGreedyZeroOrMore.of(s2 ->
+				MatcherOfFold.of(
+					(str, start, end, lst) -> {
+						ArrayList<String> row = new ArrayList<>();
+						lst.stream().forEach(f -> {
+							f.value.ifPresent(v -> row.add(v));
 						});
-						return Optional.of(csv);
-					},
-					MatcherOfGreedyZeroOrMore.of(
-						(s2) -> {
-							return MatcherOfFold.of(
-								(str, start, end, lst) -> {
-									ArrayList<String> row = new ArrayList<>();
-									lst.stream().forEach(f -> {
-										f.value.ifPresent(v -> row.add(v));
-									});
-									return Optional.of(row);
-								}, MatcherOfGreedyZeroOrMore.of(
-								(s3) -> {
-									return MatcherOfSelect.of(
-										(s4) -> {
-											return MatcherOfJust.of("\"")
-												.match(s4).flatMap(r0 -> {
-													return r0.next(s4, MatcherOfGreedyZeroOrMore.of(
-														(str, start, end, m) -> {
-															return Optional.of(
-																	str.substring(start, end)
-																		.replace("\"\"", "\""));
-														},
-														MatcherOfSelect.of(
-															MatcherOfJust.of("\"\"")
-														).or(MatcherOfNegativeCharacterClass.of(
-															MatcherOfAsciiCharacterClass.of("\"")
-														)).toContinuation()
-												)).flatMap(r1 -> r1.skip(s4, MatcherOfJust.of("\"")));
-											});
-										}
-									).or(MatcherOfGreedyZeroOrMore.of(
+						return Optional.of(row);
+					}, MatcherOfGreedyZeroOrMore.of(s3 ->
+						MatcherOfSelect.of(s4 ->
+							MatcherOfJust.of("\"")
+								.match(s4).flatMap(r0 ->
+									r0.next(s4, MatcherOfGreedyZeroOrMore.of(
 										(str, start, end, m) -> {
-											return Optional.of(str.substring(start, end));
-										}, MatcherOfNegativeCharacterClass.of(
-											MatcherOfAsciiCharacterClass.of(",\r\n")
-										).toContinuation()
-									)).match(s3)
-									.flatMap(r0 -> r0.next(s3, MatcherOfSelect.of(
-										MatcherOfJust.of((str, start, end, m) -> {
-												return Optional.of(false);
-											}, ",")
-										).or(MatcherOfAsciiCharacterClass.of(
-											(str, start, end, m) -> {
-												return Optional.of(true);
-											}, "\r\n")
-										).or(MatcherOfEndOfContent.of(
-											(str, start, end, m) -> {
-												return Optional.of(true);
-											})
-										).toContinuation(r1 -> {
-											if(r1.value.orElse(false))
-											{
-												return Termination.of(
-														r0.compositeOf(r1.range.end));
-											}
-											else
-											{
-												return Continuation.of(
-														r0.compositeOf(r1.range.end));
-											}
-										}))
-									);
-								}
-						)).match(s2)
-						.flatMap(r0 ->  r0.next(s2,
-							MatcherOfSelect.of(
-								MatcherOfAsciiCharacterClass.of(
-									(str, start, end, m) -> {
-										return Optional.of(false);
-									}, ",\r\n")
+											return Optional.of(
+													str.substring(start, end)
+														.replace("\"\"", "\""));
+										},
+										MatcherOfSelect.of(
+											MatcherOfJust.of("\"\"")
+										).or(MatcherOfNegativeCharacterClass.of(
+											MatcherOfAsciiCharacterClass.of("\"")
+										)).toContinuation()
+								)).flatMap(r1 -> r1.skip(s4, MatcherOfJust.of("\"")))
 							)
-							.or(MatcherOfEndOfContent.of(
+						).or(MatcherOfGreedyZeroOrMore.of(
+							(str, start, end, m) -> {
+								return Optional.of(str.substring(start, end));
+							}, MatcherOfNegativeCharacterClass.of(
+								MatcherOfAsciiCharacterClass.of(",\r\n")
+							).toContinuation()
+						)).match(s3)
+						.flatMap(r0 -> r0.next(s3, MatcherOfSelect.of(
+							MatcherOfJust.of((str, start, end, m) -> {
+									return Optional.of(false);
+								}, ",")
+							).or(MatcherOfAsciiCharacterClass.of(
+								(str, start, end, m) -> {
+									return Optional.of(true);
+								}, "\r\n")
+							).or(MatcherOfEndOfContent.of(
 								(str, start, end, m) -> {
 									return Optional.of(true);
 								})
 							).toContinuation(r1 -> {
-								if(r1.value.orElse(false).equals(Boolean.TRUE))
+								if(r1.value.orElse(false))
 								{
 									return Termination.of(
 											r0.compositeOf(r1.range.end));
@@ -144,11 +113,37 @@ public class MatcherOfFoldTest {
 											r0.compositeOf(r1.range.end));
 								}
 							}))
-						);
+						)
+					)
+				).match(s2)
+				.flatMap(r0 -> r0.next(s2,
+					MatcherOfSelect.of(
+						MatcherOfAsciiCharacterClass.of(
+							(str, start, end, m) -> {
+								return Optional.of(false);
+							}, ",\r\n")
+					)
+					.or(MatcherOfEndOfContent.of(
+						(str, start, end, m) -> {
+							return Optional.of(true);
+						})
+					).toContinuation(r1 -> {
+						if(r1.value.orElse(false).equals(Boolean.TRUE))
+						{
+							return Termination.of(
+									r0.compositeOf(r1.range.end));
+						}
+						else
+						{
+							return Continuation.of(
+									r0.compositeOf(r1.range.end));
+						}
 					})
-				).match(s1)
-				.flatMap(r0 -> r0.skip(s1, MatcherOfEndOfContent.of()));
-		}), org.hamcrest.core.Is.<Optional<MatchResult<ArrayList<ArrayList<String>>>>>is(
+				)
+			))
+		).match(s1)
+		.flatMap(r0 -> r0.skip(s1, MatcherOfEndOfContent.of()))
+	), org.hamcrest.core.Is.<Optional<MatchResult<ArrayList<ArrayList<String>>>>>is(
 					Optional.of(MatchResult.of(new Range(0, csv.length()),Optional.of(
 						new ArrayList<ArrayList<String>>() {{
 							add(new ArrayList<String>() {{
