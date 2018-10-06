@@ -66,53 +66,54 @@ public class MatcherOfFoldTest {
 						});
 						return Optional.of(row);
 					}, MatcherOfGreedyZeroOrMore.of(s3 ->
-					MatcherOfSelect.of(
-						MatcherOfJust.of("\"")
-							.next(MatcherOfGreedyZeroOrMore.of(
+						MatcherOfSelect.of(
+							MatcherOfJust.of("\"")
+								.next(MatcherOfGreedyZeroOrMore.of(
+									(str, start, end, m) -> {
+										return Optional.of(
+												str.substring(start, end)
+													.replace("\"\"", "\""));
+									},
+									MatcherOfSelect.of(
+										MatcherOfJust.of("\"\"")
+									).or(MatcherOfNegativeCharacterClass.of(
+										MatcherOfAsciiCharacterClass.of("\"")
+									)
+								).toContinuation())
+							).skip(MatcherOfJust.of("\""))
+						).or(MatcherOfGreedyZeroOrMore.of(
+							(str, start, end, m) -> {
+								return Optional.of(str.substring(start, end));
+							}, MatcherOfNegativeCharacterClass.of(
+								MatcherOfAsciiCharacterClass.of(",\r\n")
+							).toContinuation()
+						)).match(s3)
+						.flatMap(r0 -> r0.next(s3, MatcherOfSelect.of(
+							MatcherOfJust.of((str, start, end, m) -> {
+									return Optional.of(false);
+								}, ",")
+							).or(MatcherOfAsciiCharacterClass.of(
 								(str, start, end, m) -> {
-									return Optional.of(
-											str.substring(start, end)
-												.replace("\"\"", "\""));
-								},
-								MatcherOfSelect.of(
-									MatcherOfJust.of("\"\"")
-								).or(MatcherOfNegativeCharacterClass.of(
-									MatcherOfAsciiCharacterClass.of("\"")
-								)
-							).toContinuation())
-						).skip(MatcherOfJust.of("\""))
-					).or(MatcherOfGreedyZeroOrMore.of(
-						(str, start, end, m) -> {
-							return Optional.of(str.substring(start, end));
-						}, MatcherOfNegativeCharacterClass.of(
-							MatcherOfAsciiCharacterClass.of(",\r\n")
-						).toContinuation()
-					)).match(s3)
-					.flatMap(r0 -> r0.next(s3, MatcherOfSelect.of(
-						MatcherOfJust.of((str, start, end, m) -> {
-								return Optional.of(false);
-							}, ",")
-						).or(MatcherOfAsciiCharacterClass.of(
-							(str, start, end, m) -> {
-								return Optional.of(true);
-							}, "\r\n")
-						).or(MatcherOfEndOfContent.of(
-							(str, start, end, m) -> {
-								return Optional.of(true);
-							})
-						).toContinuation(r1 -> {
-							if(r1.value.orElse(false))
-							{
-								return Termination.of(
-										r0.compositeOf(r1.range.end));
-							}
-							else
-							{
-								return Continuation.of(
-										r0.compositeOf(r1.range.end));
-							}
-						}))
-					))
+									return Optional.of(true);
+								}, "\r\n")
+							).or(MatcherOfEndOfContent.of(
+								(str, start, end, m) -> {
+									return Optional.of(true);
+								})
+							).toContinuation(r1 -> {
+								if(r1.value.orElse(false))
+								{
+									return Termination.of(
+											r0.compositeOf(r1.range.end));
+								}
+								else
+								{
+									return Continuation.of(
+											r0.compositeOf(r1.range.end));
+								}
+							}))
+						)
+					)
 				).match(s2)
 				.flatMap(r0 -> r0.next(s2,
 					MatcherOfSelect.of(
