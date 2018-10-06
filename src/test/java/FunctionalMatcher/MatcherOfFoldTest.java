@@ -80,7 +80,7 @@ public class MatcherOfFoldTest {
 										MatcherOfAsciiCharacterClass.of("\"")
 									)
 								).toContinuation())
-							).skip(MatcherOfJust.of("\""))
+								).skip(MatcherOfJust.of("\""))
 						).or(MatcherOfGreedyZeroOrMore.of(
 							(str, start, end, m) -> {
 								return Optional.of(str.substring(start, end));
