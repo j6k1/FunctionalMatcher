@@ -32,7 +32,9 @@ public interface IMatcher<T> {
 	default <R> IMatcher<T> skip(IMatcher<R> n) {
 		return (state) -> {
 			return this.match(state).flatMap(r -> {
-				return n.match(State.of(state.str, r.range.end, state.temporary)).map(rn -> r);
+				return n.match(
+						State.of(state.str, r.range.end, state.temporary))
+								.map(rn -> r.compositeOf(rn.range.end));
 			});
 		};
 	}

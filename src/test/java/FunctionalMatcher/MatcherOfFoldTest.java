@@ -66,22 +66,21 @@ public class MatcherOfFoldTest {
 						});
 						return Optional.of(row);
 					}, MatcherOfGreedyZeroOrMore.of(s3 ->
-						MatcherOfSelect.of(s4 ->
+					MatcherOfSelect.of(
 							MatcherOfJust.of("\"")
-								.match(s4).flatMap(r0 ->
-									r0.next(s4, MatcherOfGreedyZeroOrMore.of(
-										(str, start, end, m) -> {
-											return Optional.of(
-													str.substring(start, end)
-														.replace("\"\"", "\""));
-										},
-										MatcherOfSelect.of(
-											MatcherOfJust.of("\"\"")
-										).or(MatcherOfNegativeCharacterClass.of(
-											MatcherOfAsciiCharacterClass.of("\"")
-										)).toContinuation()
-								)).flatMap(r1 -> r1.skip(s4, MatcherOfJust.of("\"")))
-							)
+								.next(MatcherOfGreedyZeroOrMore.of(
+									(str, start, end, m) -> {
+										return Optional.of(
+												str.substring(start, end)
+													.replace("\"\"", "\""));
+									},
+									MatcherOfSelect.of(
+										MatcherOfJust.of("\"\"")
+									).or(MatcherOfNegativeCharacterClass.of(
+										MatcherOfAsciiCharacterClass.of("\"")
+									)
+								).toContinuation())
+							).skip(MatcherOfJust.of("\""))
 						).or(MatcherOfGreedyZeroOrMore.of(
 							(str, start, end, m) -> {
 								return Optional.of(str.substring(start, end));
