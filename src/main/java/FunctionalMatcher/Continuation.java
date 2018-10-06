@@ -10,6 +10,11 @@ public class Continuation<T> implements IContinuation<T> {
 
 	public static <T> Continuation<T> of(MatchResult<T> result)
 	{
+		if(result == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the MatchResult.");
+		}
+
 		return new Continuation<T>(result);
 	}
 

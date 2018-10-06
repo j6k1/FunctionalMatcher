@@ -14,26 +14,66 @@ public class MatchResult<T> {
 
 	public static <T> MatchResult<T> of(Range range, Optional<T> value)
 	{
+		if(range == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the range.");
+		}
+		else if(value == null) {
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the value.");
+		}
+
 		return new MatchResult<T>(range, value);
 	}
 
 	public <R> Optional<MatchResult<R>> next(State state, IMatcher<R> matcher)
 	{
+		if(state == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
+		}
+		else if(matcher == null) {
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+
 		return matcher.match(State.of(state.str, range.end, false));
 	}
 
 	public <R> Optional<IContinuation<R>> next(State state, IContinuationMatcher<R> matcher)
 	{
+		if(state == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
+		}
+		else if(matcher == null) {
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+
 		return matcher.matchc(State.of(state.str, range.end, false));
 	}
 
 	public <R> Optional<MatchResult<T>> skip(State state, IMatcher<R> matcher)
 	{
+		if(state == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
+		}
+		else if(matcher == null) {
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+
 		return matcher.match(State.of(state.str, range.end, true)).map(r -> this.compositeOfEnd(r.range.end));
 	}
 
 	public <R> Optional<MatchResult<R>> back(State state, IFixedLengthMatcher<R> matcher)
 	{
+		if(state == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
+		}
+		else if(matcher == null) {
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+
 		if(range.start - matcher.length() < 0) return Optional.empty();
 		else return matcher.match(State.of(state.str, range.start - matcher.length(), true)).map(r -> {
 			return MatchResult.of(new Range(range.start, range.start), Optional.empty());
@@ -42,6 +82,14 @@ public class MatchResult<T> {
 
 	public <R> Optional<MatchResult<R>> back(State state, MatcherOfFixedLengthSelect<R> matcher)
 	{
+		if(state == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
+		}
+		else if(matcher == null) {
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+
 		for(IFixedLengthMatcher<R> m: matcher)
 		{
 			if(range.start - m.length() >= 0)
@@ -69,11 +117,21 @@ public class MatchResult<T> {
 
 	public MatchResult<T> compositeOf(Range range)
 	{
+		if(range == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the range.");
+		}
+
 		return MatchResult.of(range, value);
 	}
 
 	public <I> MatchResult<T> compositeOf(MatchResult<I> m)
 	{
+		if(m == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the MatchResult.");
+		}
+
 		return MatchResult.of(m.range, value);
 	}
 

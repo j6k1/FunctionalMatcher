@@ -48,6 +48,11 @@ public class MatcherOfSequence<T> implements IMatcher<T>, IListMatcher<T> {
 	}
 
 	public <R> IMatcher<R> map(IOnMatch<T,R> callback) {
+		if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
 		return (State state) -> {
 			return MatcherOfSequence.this.match(state).map(r -> {
 				return MatchResult.of(r.range, callback.onmatch(state.str, state.start, r.range.end, Optional.of(r)));
@@ -56,6 +61,11 @@ public class MatcherOfSequence<T> implements IMatcher<T>, IListMatcher<T> {
 	}
 
 	public <R> IMatcher<R> mapl(IOnListMatch<T,R> callback) {
+		if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
 		return (State state) -> {
 			return MatcherOfSequence.this.matchl(state).map(r -> {
 				return MatchResult.of(r.range, callback.onmatch(state.str, state.start, r.range.end, r));

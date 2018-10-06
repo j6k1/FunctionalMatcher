@@ -17,6 +17,11 @@ public class Range {
 
 	public Range compositeOf(Range r)
 	{
+		if(r == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the range.");
+		}
+
 		return new Range(this.start, r.end);
 	}
 

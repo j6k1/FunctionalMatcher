@@ -12,6 +12,11 @@ public class State {
 	}
 
 	public static State of(String str, int start, boolean temporary) {
+		if(str == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
+		}
+
 		return new State(str, start, temporary);
 	}
 }

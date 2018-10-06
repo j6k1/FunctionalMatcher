@@ -20,6 +20,16 @@ public class BacktrackSelectMatcher<T> implements IMatcher<T> {
 
 	@Override
 	public Optional<MatchResult<T>> match(State state) {
+		if(state == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
+		}
+
+		if(state.str == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
+		}
+
 		for(IFixedLengthMatcher<T> m: matcher)
 		{
 			if(state.start - m.length() >= 0)

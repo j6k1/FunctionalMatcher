@@ -26,6 +26,12 @@ public class BacktrackMatcher<T> implements IMatcher<T> {
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
 		}
+
+		if(state.str == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
+		}
+
 		if(state.start - matcher.length() < 0) return Optional.empty();
 		else return matcher.match(State.of(state.str, state.start - matcher.length(), true)).map(r -> {
 			return MatchResult.of(new Range(state.start, state.start), Optional.empty());

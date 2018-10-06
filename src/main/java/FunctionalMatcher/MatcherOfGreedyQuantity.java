@@ -11,19 +11,6 @@ public abstract class MatcherOfGreedyQuantity<T,R> implements IMatcher<R>, IList
 
 	protected MatcherOfGreedyQuantity(IOnMatch<T,R> callback, IContinuationMatcher<T> matcher, int startTimes)
 	{
-		if(matcher == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
-		}
-		else if(startTimes < 0)
-		{
-			throw new InvalidMatchConditionException("A negative value was specified for the number of matches.");
-		}
-		else if(callback == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
-		}
-
 		this.matcher = matcher;
 		this.startTimes = startTimes;
 		this.callback = callback;

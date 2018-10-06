@@ -20,6 +20,11 @@ public class MatcherExecutor {
 
 	public static <T> IMatchFinder<T> find(String str, IMatcher<T> matcher)
 	{
+		if(str == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
+		}
+
 		return MatchFinder.of(matcher, str, 0);
 	}
 

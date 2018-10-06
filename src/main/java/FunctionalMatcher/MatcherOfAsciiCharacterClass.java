@@ -15,11 +15,6 @@ public class MatcherOfAsciiCharacterClass<T,R> implements IMatcherOfCharacterCla
 
 	protected MatcherOfAsciiCharacterClass(IOnMatch<T,R> callback, String characters)
 	{
-		if(characters == null)
-		{
-			throw new NullReferenceNotAllowedException("The reference to the argument characters is null.");
-		}
-
 		char[] chars = characters.toCharArray();
 
 		for(char c: chars)
@@ -38,16 +33,36 @@ public class MatcherOfAsciiCharacterClass<T,R> implements IMatcherOfCharacterCla
 
 	public static <T,R> MatcherOfAsciiCharacterClass<T,R> of(IOnMatch<T,R> callback, String characters)
 	{
+		if(characters == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument characters is null.");
+		}
+
+		if(callback == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument callback is null.");
+		}
+
 		return new MatcherOfAsciiCharacterClass<T,R>(callback, characters);
 	}
 
 	public static <T> MatcherOfAsciiCharacterClass<T,T> of(MatchResultType<T> t, String characters)
 	{
+		if(characters == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument characters is null.");
+		}
+
 		return new MatcherOfAsciiCharacterClass<T,T>((str, start, end, m) -> Optional.empty(), characters);
 	}
 
 	public static MatcherOfAsciiCharacterClass<Nothing,Nothing> of(String characters)
 	{
+		if(characters == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument characters is null.");
+		}
+
 		return new MatcherOfAsciiCharacterClass<Nothing,Nothing>(
 												(str, start, end, m) -> Optional.empty(), characters);
 	}

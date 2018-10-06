@@ -26,6 +26,12 @@ public class AnchorMatcher<T> implements IMatcher<T> {
 		{
 			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the state.");
 		}
+
+		if(state.str == null)
+		{
+			throw new NullReferenceNotAllowedException("A null value was passed as a reference to the content string.");
+		}
+
 		return matcher.match(State.of(state.str, state.start, true)).map(r -> {
 			return MatchResult.of(r.range, Optional.empty());
 		});
