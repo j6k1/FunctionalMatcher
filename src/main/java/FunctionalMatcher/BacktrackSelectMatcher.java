@@ -10,6 +10,11 @@ public class BacktrackSelectMatcher<T> implements IMatcher<T> {
 	}
 
 	public BacktrackSelectMatcher<T> of(MatcherOfFixedLengthSelect<T> matcher) {
+		if(matcher == null)
+		{
+			throw new NullReferenceNotAllowedException("The reference to the argument matcher is null.");
+		}
+
 		return new BacktrackSelectMatcher<T>(matcher);
 	}
 
