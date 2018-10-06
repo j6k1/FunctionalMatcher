@@ -59,7 +59,7 @@ public class MatcherOfEndOfLine<T,R> implements IMatcher<R> {
 		{
 			throw new InvalidMatchStateException("The current position is outside the content range.");
 		}
-		else if(start + 1 == l || (start + 1 < l && (c = str.charAt(start + 1)) != '\r' && c != '\n'))
+		else if(start < l && (c = str.charAt(start)) != '\r' && c != '\n')
 		{
 			return Optional.empty();
 		}
