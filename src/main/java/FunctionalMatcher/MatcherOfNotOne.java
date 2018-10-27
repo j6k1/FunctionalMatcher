@@ -22,7 +22,7 @@ public class MatcherOfNotOne<T> implements IMatcher<T> {
 	@Override
 	public Optional<MatchResult<T>> match(State state) {
 
-		if(matcher.match(State.of(state.str, state.start, true)).isPresent())
+		if(matcher.match(State.of(state.str, state.start, state.temporary)).isPresent())
 		{
 			return Optional.empty();
 		} else {
