@@ -5,7 +5,7 @@ import java.util.Optional;
 public class MatcherOfNotOne<T> implements IMatcher<T> {
 	protected final IMatcher<T> matcher;
 
-	protected MatcherOfNotOne(IMatcher matcher) {
+	protected MatcherOfNotOne(IMatcher<T> matcher) {
 		this.matcher = matcher;
 	}
 
